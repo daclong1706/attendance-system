@@ -1,7 +1,5 @@
-import { NavLink } from "react-router-dom";
-import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
-import { FaUserFriends } from "react-icons/fa";
-import { FaCalendar } from "react-icons/fa6";
+import { useState } from "react";
+import { LuPanelLeftOpen, LuPanelRightOpen } from "react-icons/lu";
 import {
   MdAccountCircle,
   MdAssessment,
@@ -10,11 +8,15 @@ import {
   MdSettings,
   MdSpaceDashboard,
 } from "react-icons/md";
-import { SiGoogleclassroom } from "react-icons/si";
-import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
-const Sidebar = () => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Trạng thái thu nhỏ/mở rộng
+interface Props {
+  isOpenSidebar: boolean;
+  toggleSidebar: () => void;
+}
+
+const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const role = "admin"; // Thay đổi role tùy người dùng
 
   const adminLinks = [
@@ -73,51 +75,92 @@ const Sidebar = () => {
     return [];
   };
 
-  const toggleSidebar = () => {
+  const toggleSidebarCollapsed = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Đổi trạng thái mở/thu nhỏ
   };
 
   return (
-    <div
-      className={`flex h-screen bg-white dark:bg-gray-900 ${
-        isSidebarCollapsed ? "w-24" : "w-64"
-      } transform transition-all duration-300`}
-    >
-      {/* Nút thu nhỏ/mở rộng */}
-      <div className="mx-3 my-6 flex w-full flex-col rounded-md p-2 shadow-2xl dark:bg-gray-800 dark:shadow-none">
-        <button
-          onClick={toggleSidebar}
-          className="mb-6 flex items-center justify-center rounded-md p-2 hover:text-indigo-500 dark:text-white"
-        >
-          {isSidebarCollapsed ? (
-            <LuPanelLeftOpen className="h-5 w-5" />
-          ) : (
-            <LuPanelRightOpen className="h-5 w-5" />
-          )}
-        </button>
+    <>
+      {isOpenSidebar && (
+        <>
+          {/* Sidebar */}
+          <div
+            className={`fixed top-0 left-0 z-20 h-screen transform bg-white shadow-lg transition-transform duration-300 dark:bg-gray-900 ${
+              isOpenSidebar ? "translate-x-0" : "-translate-x-full"
+            } w-64`}
+          >
+            <div className="flex h-full flex-col p-4 shadow-xl dark:bg-gray-800">
+              <nav className="mt-10 flex-grow text-[#A3AED0] dark:text-white">
+                {getLinks().map((item, index) => (
+                  <NavLink
+                    key={index}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center rounded-md py-4 transition duration-300 ${
+                        isOpenSidebar ? "space-x-2 pl-4" : "justify-center"
+                      } ${isActive ? "text-indigo-500" : "hover:bg-indigo-300"}`
+                    }
+                    title={item.label}
+                    onClick={toggleSidebar}
+                  >
+                    {item.icon}
+                    {isOpenSidebar && <span>{item.label}</span>}
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+          </div>
 
-        {/* Các liên kết */}
-        <nav className="flex-grow text-[#A3AED0] dark:text-white">
-          {getLinks().map((link, index) => (
-            <NavLink
-              key={index}
-              to={link.path}
-              className={({ isActive }) =>
-                `flex w-full items-center rounded-md ${
-                  isSidebarCollapsed ? "justify-center" : "space-x-2 pl-4"
-                } py-4 transition duration-300 ${
-                  isActive ? "text-indigo-500" : "hover:bg-indigo-300"
-                }`
-              }
-              title={link.label}
-            >
-              {link.icon}
-              {!isSidebarCollapsed && <span>{link.label}</span>}
-            </NavLink>
-          ))}
-        </nav>
+          {/* Background mờ khi mở sidebar trên điện thoại */}
+          {isOpenSidebar && (
+            <div
+              className="fixed inset-0 z-10 bg-black opacity-50 md:hidden"
+              onClick={toggleSidebar}
+            ></div>
+          )}
+        </>
+      )}
+      <div
+        className={`hidden h-screen bg-white md:flex dark:bg-gray-900 ${
+          isSidebarCollapsed ? "w-24" : "w-64"
+        } transform transition-all duration-300`}
+      >
+        {/* Nút thu nhỏ/mở rộng */}
+        <div className="mx-3 my-6 flex w-full flex-col rounded-md p-2 shadow-2xl dark:bg-gray-800 dark:shadow-none">
+          <button
+            onClick={toggleSidebarCollapsed}
+            className="mb-6 flex items-center justify-center rounded-md p-2 hover:text-indigo-500 dark:text-white"
+          >
+            {isSidebarCollapsed ? (
+              <LuPanelLeftOpen className="h-5 w-5" />
+            ) : (
+              <LuPanelRightOpen className="h-5 w-5" />
+            )}
+          </button>
+
+          {/* Các liên kết */}
+          <nav className="flex-grow text-[#A3AED0] dark:text-white">
+            {getLinks().map((link, index) => (
+              <NavLink
+                key={index}
+                to={link.path}
+                className={({ isActive }) =>
+                  `flex w-full items-center rounded-md ${
+                    isSidebarCollapsed ? "justify-center" : "space-x-2 pl-4"
+                  } py-4 transition duration-300 ${
+                    isActive ? "text-indigo-500" : "hover:bg-indigo-300"
+                  }`
+                }
+                title={link.label}
+              >
+                {link.icon}
+                {!isSidebarCollapsed && <span>{link.label}</span>}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
