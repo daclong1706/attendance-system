@@ -1,14 +1,23 @@
-// import { MdSpaceDashboard, MdAssessment, MdSettings } from "react-icons/md";
-// import { FaUserFriends, FaCalendar } from "react-icons/fa6";
-// import { SiGoogleclassroom } from "react-icons/si";
+import {
+  MdAssessment,
+  MdCalendarMonth,
+  MdGroup,
+  MdNotifications,
+  MdOutlineNoteAlt,
+  MdPerson,
+  MdSettings,
+  MdSpaceDashboard,
+} from "react-icons/md";
 
-// const iconClasses = "h-5 w-5"; // Định nghĩa chung
+const iconClasses = "h-5 w-5";
 
-// const icons = {
-//   dashboard: <MdSpaceDashboard className={iconClasses} />,
-//   userManagement: <FaUserFriends className={iconClasses} />,
-//   classManagement: <SiGoogleclassroom className={iconClasses} />,
-//   scheduleManagement: <FaCalendar className={iconClasses} />,
-//   reports: <MdAssessment className={iconClasses} />,
-//   settings: <MdSettings className={iconClasses} />,
-// };
+export const icons = {
+  dashboard: <MdSpaceDashboard className={iconClasses} />,
+  userManagement: <MdPerson className={iconClasses} />,
+  classManagement: <MdGroup className={iconClasses} />,
+  scheduleManagement: <MdCalendarMonth className={iconClasses} />,
+  reports: <MdAssessment className={iconClasses} />,
+  settings: <MdSettings className={iconClasses} />,
+  attendance: <MdOutlineNoteAlt className={iconClasses} />,
+  notification: <MdNotifications className={iconClasses} />,
+};

@@ -9,6 +9,7 @@ import {
   MdSpaceDashboard,
 } from "react-icons/md";
 import { NavLink } from "react-router-dom";
+import { icons } from "../../constant/icon";
 
 interface Props {
   isOpenSidebar: boolean;
@@ -17,61 +18,73 @@ interface Props {
 
 const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const role = "admin"; // Thay đổi role tùy người dùng
+  const role = "teacher"; // Thay đổi role tùy người dùng
 
   const adminLinks = [
     {
       path: "/",
       label: "Dashboard",
-      icon: <MdSpaceDashboard className="h-5 w-5" />,
+      icon: icons.dashboard,
     },
     {
       path: "/user-management",
       label: "Người dùng",
-      icon: <MdAccountCircle className="h-5 w-5" />,
+      icon: icons.userManagement,
     },
     {
       path: "/class-management",
       label: "Lớp học",
-      icon: <MdGroup className="h-5 w-5" />,
+      icon: icons.classManagement,
     },
     {
       path: "/schedule-management",
       label: "Thời khóa biểu",
-      icon: <MdCalendarMonth className="h-5 w-5" />,
+      icon: icons.scheduleManagement,
     },
     {
       path: "/reports",
       label: "Báo cáo",
-      icon: <MdAssessment className="h-5 w-5" />,
+      icon: icons.reports,
     },
     {
       path: "/settings",
       label: "Cài đặt",
-      icon: <MdSettings className="h-5 w-5" />,
+      icon: icons.settings,
     },
   ];
 
-  // const teacherLinks = [
-  //   { path: "/", label: "Dashboard" },
-  //   { path: "/attendance", label: "Điểm danh" },
-  //   { path: "/class-management", label: "Danh sách lớp" },
-  //   { path: "/schedule", label: "Thời khóa biểu" },
-  //   { path: "/reports", label: "Báo cáo lớp học" },
-  // ];
+  const teacherLinks = [
+    { path: "/", label: "Dashboard", icon: icons.dashboard },
+    { path: "/attendance", label: "Điểm danh", icon: icons.attendance },
+    {
+      path: "/class-management",
+      label: "Danh sách lớp",
+      icon: icons.classManagement,
+    },
+    {
+      path: "/schedule",
+      label: "Thời khóa biểu",
+      icon: icons.scheduleManagement,
+    },
+    { path: "/reports", label: "Báo cáo lớp học", icon: icons.reports },
+  ];
 
-  // const studentLinks = [
-  //   { path: "/", label: "Dashboard" },
-  //   { path: "/schedule", label: "Lịch học" },
-  //   { path: "/attendance-status", label: "Tình trạng điểm danh" },
-  //   { path: "/notifications", label: "Thông báo" },
-  //   { path: "/personal-report", label: "Báo cáo cá nhân" },
-  // ];
+  const studentLinks = [
+    { path: "/", label: "Dashboard", icon: icons.dashboard },
+    { path: "/schedule", label: "Lịch học", icon: icons.scheduleManagement },
+    {
+      path: "/attendance-status",
+      label: "Tình trạng điểm danh",
+      icon: icons.attendance,
+    },
+    { path: "/notifications", label: "Thông báo", icon: icons.notification },
+    { path: "/personal-report", label: "Báo cáo cá nhân", icon: icons.reports },
+  ];
 
   const getLinks = () => {
     if (role === "admin") return adminLinks;
-    // if (role === "teacher") return teacherLinks;
-    // if (role === "student") return studentLinks;
+    if (role === "teacher") return teacherLinks;
+    if (role === "student") return studentLinks;
     return [];
   };
 
