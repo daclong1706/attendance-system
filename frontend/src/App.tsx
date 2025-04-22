@@ -5,11 +5,13 @@ import UserManagement from "./pages/Admin/UserManagement";
 import Attendance from "./pages/Teacher/Attendance";
 import { ThemeProvider } from "flowbite-react";
 import { theme } from "./components/utils/theme";
+import { Toaster } from "sonner";
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
+        <Toaster position="top-right" />
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
