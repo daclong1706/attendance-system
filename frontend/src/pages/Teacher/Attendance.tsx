@@ -1,3 +1,4 @@
+import { saveAs } from "file-saver";
 import {
   Button,
   Checkbox,
@@ -6,15 +7,13 @@ import {
   DropdownItem,
 } from "flowbite-react";
 import { useState } from "react";
-import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
-import { toast } from "sonner";
+import { AiOutlineSearch } from "react-icons/ai";
 import { MdQrCode2 } from "react-icons/md";
 import { TbFaceId } from "react-icons/tb";
-import FaceAttendance from "../Attendance/FaceAttendance";
-import QRAttendance from "../Attendance/QrAttendance";
-import { AiOutlineSearch } from "react-icons/ai";
+import * as XLSX from "xlsx";
 import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
+import FaceAttendance from "../Attendance/FaceAttendance";
+import QRAttendance from "../Attendance/QRAttendance";
 
 const fakeUsers = [
   {

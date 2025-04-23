@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { showErrorMessage } from "../helper/toastHelper";
 
 const CameraFeed = () => {
   // const videoRef = useRef<HTMLVideoElement>(null);

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import UserManagement from "./pages/Admin/UserManagement";
@@ -6,6 +6,10 @@ import Attendance from "./pages/Teacher/Attendance";
 import { ThemeProvider } from "flowbite-react";
 import { theme } from "./components/utils/theme";
 import { Toaster } from "sonner";
+import Login from "./pages/Login";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import ClassList from "./pages/Teacher/ClassList";
+import Schedule from "./pages/Teacher/Schedule";
 
 export default function App() {
   return (
@@ -13,10 +17,52 @@ export default function App() {
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="/user-management" element={<UserManagement />} />
-            <Route path="/attendance" element={<Attendance />} />
+          <Route path="/">
+            <Route index element={<Navigate to="/login" />} />
+            <Route path="login" element={<Login />} />
+          </Route>
+          <Route
+            path="/student"
+            element={
+              <ProtectedRoute role="student">
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/student/dashboard" />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="class-list" element={<Attendance />} />
+            {/* <Route path="/schedule" element={<SchedulePage />} /> */}
+          </Route>
+          <Route
+            path="/teacher"
+            element={
+              <ProtectedRoute role="teacher">
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/teacher/dashboard" />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="class" element={<ClassList />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="schedule" element={<Schedule />} />
+            {/* <Route path="/schedule" element={<SchedulePage />} /> */}
+          </Route>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/admin/dashboard" />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="user-management" element={<UserManagement />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="class-list" element={<Attendance />} />
             {/* <Route path="/schedule" element={<SchedulePage />} /> */}
           </Route>
         </Routes>

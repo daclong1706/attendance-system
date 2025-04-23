@@ -3,7 +3,7 @@ import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 interface SortIconProps {
   sortColumn: string;
   columnName: string;
-  sortDirection: "asc" | "desc" | "";
+  sortDirection?: "asc" | "desc" | "";
 }
 
 const SortIcon: React.FC<SortIconProps> = ({
