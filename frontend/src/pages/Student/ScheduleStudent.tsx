@@ -4,10 +4,10 @@ import {
   generateAcademicYears,
   getSemesterDates,
 } from "../../helper/scheduleHelper";
-import ScheduleTable from "../../components/ui/table/scheduleTable";
 import scheduleData from "../../assets/data/schedule";
+import ScheduleTable from "../../components/ui/table/scheduleTable";
 
-const Schedule = () => {
+const ScheduleStudent = () => {
   const academicYears = generateAcademicYears(2022, 2030);
   const semesters = ["Học kỳ 1", "Học kỳ 2", "Học kỳ Hè"];
 
@@ -51,4 +51,4 @@ const Schedule = () => {
   );
 };
 
-export default Schedule;
+export default ScheduleStudent;

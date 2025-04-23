@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ClassList from "./pages/Teacher/ClassList";
 import Schedule from "./pages/Teacher/Schedule";
+import ScheduleStudent from "./pages/Student/ScheduleStudent";
+import ClassManagement from "./pages/Admin/ClassManagement";
 
 export default function App() {
   return (
@@ -31,7 +33,7 @@ export default function App() {
           >
             <Route index element={<Navigate to="/student/dashboard" />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="attendance" element={<Attendance />} />
+            <Route path="schedule" element={<ScheduleStudent />} />
             <Route path="class-list" element={<Attendance />} />
             {/* <Route path="/schedule" element={<SchedulePage />} /> */}
           </Route>
@@ -62,7 +64,7 @@ export default function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="attendance" element={<Attendance />} />
-            <Route path="class-list" element={<Attendance />} />
+            <Route path="class-management" element={<ClassManagement />} />
             {/* <Route path="/schedule" element={<SchedulePage />} /> */}
           </Route>
         </Routes>

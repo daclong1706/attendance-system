@@ -1,8 +1,8 @@
 import React from "react";
-import { formatDate } from "../../helper/scheduleHelper";
-import TableComponent from "../../components/ui/table/TableComponent";
-import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
-import TableRowComponent from "../../components/ui/table/TableRowComponent";
+import { formatDate } from "../../../helper/scheduleHelper";
+import TableComponent from "./TableComponent";
+import TableHeadComponent from "./TableHeadComponent";
+import TableRowComponent from "./TableRowComponent";
 
 interface ScheduleEntry {
   room: string;
@@ -34,6 +34,23 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   const startOfWeek = new Date(
     selectedWeek.split(" - ")[0].split("/").reverse().join("-"),
   ); // Chuyển đổi chuỗi ngày thành Date
+  const isWithinSelectedWeek = (
+    startDate: string,
+    endDate: string,
+    selectedWeek: string,
+  ) => {
+    const weekStart = new Date(
+      selectedWeek.split(" - ")[0].split("/").reverse().join("-"),
+    );
+    const weekEnd = new Date(
+      selectedWeek.split(" - ")[1].split("/").reverse().join("-"),
+    );
+
+    const start = new Date(startDate.split("/").reverse().join("-"));
+    const end = new Date(endDate.split("/").reverse().join("-"));
+
+    return start <= weekEnd && end >= weekStart;
+  };
 
   return (
     <div className="mt-4 overflow-x-auto">
@@ -57,11 +74,18 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
               <td className="px-4 py-2 font-semibold">{room}</td>
               {daysOfWeek.map((day) => {
                 const entry = scheduleData.find(
-                  (item) => item.room === room && item.day === day,
+                  (item) =>
+                    item.room === room &&
+                    item.day === day &&
+                    isWithinSelectedWeek(
+                      item.startDate,
+                      item.endDate,
+                      selectedWeek,
+                    ),
                 );
                 return (
                   <td key={day} className="px-4 py-2 text-center">
-                    {entry ? `${entry.subject} (${entry.period})` : ""}
+                    {entry ? `${entry.courseName} (${entry.period})` : ""}
                   </td>
                 );
               })}
