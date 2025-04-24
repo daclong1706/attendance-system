@@ -37,7 +37,7 @@ const Header = ({ toggleSidebar }: Props) => {
                   rounded
                 />
                 <div className="hidden flex-col items-start justify-center md:flex">
-                  <span className="block text-sm">No name</span>
+                  <span className="block text-sm">{user?.name}</span>
                   <span className="block truncate text-sm font-medium">
                     {user?.email}
                   </span>

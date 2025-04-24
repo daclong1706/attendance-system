@@ -20,7 +20,8 @@ def login():
             "user": {
                 "id": user.id,
                 "email": user.email,
-                "role": user.role
+                "role": user.role,
+                "name": user.name
             }
         }
     }), 200
