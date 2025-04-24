@@ -9,7 +9,7 @@ with app.app_context():
     # users = [
     #     # {"name": "Admin", "email": "admin@example.com", "mssv": "", "password": "123456", "role": "admin"},
     #     {"name": "Nguyễn Văn A", "email": "vana@example.com", "mssv": "123456", "password": "654321", "role": "student"},
-    #     {"name": "Trần Thị B", "email": "thib@example.com", "mssv": "", "password": "abcdef", "role": "teacher"},
+    #     {"name": "Trần Thị B", "email": "teacher@example.com", "mssv": "", "password": "123456", "role": "teacher"},
     #     {"name": "Lê Văn C", "email": "vanc@example.com", "mssv": "112233", "password": "qwerty", "role": "student"}
     # ]
 
