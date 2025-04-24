@@ -12,3 +12,4 @@ class Config:
     db_user=db_user, db_password=db_password, db_name=db_name
 )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY= os.environ['JWT_SECRET_KEY']

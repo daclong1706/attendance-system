@@ -4,6 +4,7 @@ import { LuPanelLeftOpen, LuPanelRightOpen } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router-dom";
 import { icons } from "../../constant/icon";
 import { Button } from "flowbite-react";
+import { useAppSelector } from "../../store/hook";
 
 interface Props {
   isOpenSidebar: boolean;
@@ -12,8 +13,8 @@ interface Props {
 
 const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = user.role;
+  const user = useAppSelector((state) => state.auth.user);
+  const role = user?.role;
   const navigate = useNavigate();
 
   const adminLinks = [
@@ -101,7 +102,6 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
     navigate("/login");
   };
 
