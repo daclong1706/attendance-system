@@ -4,6 +4,10 @@ import { FaPlusSquare } from "react-icons/fa";
 import { useTable } from "../../components/hook/useTable";
 import SortIcon from "../../components/ui/SortIcon";
 import PaginationComponent from "../../components/ui/PanigationComponent";
+import TableComponent from "../../components/ui/table/TableComponent";
+import TableHeadCellComponent from "../../components/ui/table/TableHeadCellComponent";
+import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
+import TableRowComponent from "../../components/ui/table/TableRowComponent";
 
 const data = [
   {
@@ -152,71 +156,41 @@ const Home = () => {
           {/* </Link> */}
         </div>
 
-        <table className="w-full border-separate border-spacing-y-1 text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
-          <thead className="bg-indigo-400 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th
-                scope="col"
-                className="cursor-pointer rounded-l-xl px-6 py-3"
-                onClick={() => handleSort("name")}
-              >
-                <div className="flex items-center space-x-2">
-                  {/* <span></span>
-                  <SortIcon
-                    sortColumn={sortColumn}
-                    columnName="name"
-                    sortDirection={sortDirection}
-                  /> */}
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="cursor-pointer px-6 py-3"
-                onClick={() => handleSort("name")}
-              >
-                <div className="flex items-center space-x-2">
-                  <span>Tên</span>
-                  <SortIcon
-                    sortColumn={sortColumn}
-                    columnName="name"
-                    sortDirection={sortDirection}
-                  />
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="cursor-pointer px-6 py-3"
-                onClick={() => handleSort("email")}
-              >
-                <div className="flex items-center space-x-2">
-                  <span>Email</span>
-                  <SortIcon
-                    sortColumn={sortColumn}
-                    columnName="email"
-                    sortDirection={sortDirection}
-                  />
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="cursor-pointer px-6 py-3"
-                onClick={() => handleSort("role")}
-              >
-                <div className="flex items-center space-x-2">
-                  <span>Phân Quyền</span>
-                  <SortIcon
-                    sortColumn={sortColumn}
-                    columnName="role"
-                    sortDirection={sortDirection}
-                  />
-                </div>
-              </th>
-
-              <th scope="col" className="rounded-r-xl px-6 py-3">
-                <div className="flex justify-center">Thao tác</div>
-              </th>
-            </tr>
-          </thead>
+        <TableComponent>
+          <TableHeadComponent>
+            <TableRowComponent>
+              <TableHeadCellComponent
+                className="rounded-l-xl"
+                columnName="name"
+                label="ID"
+              />
+              <TableHeadCellComponent
+                columnName="name"
+                label="Họ tên"
+                onSort={() => handleSort("name")}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+              />
+              <TableHeadCellComponent
+                columnName="email"
+                label="Email"
+                onSort={() => handleSort("email")}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+              />
+              <TableHeadCellComponent
+                columnName="role"
+                label="Phân quyền"
+                onSort={() => handleSort("role")}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+              />
+              <TableHeadCellComponent
+                columnName="action"
+                className="rounded-r-xl"
+              />
+            </TableRowComponent>
+          </TableHeadComponent>
           <tbody>
             {users.length > 0 ? (
               users.map((user) => (
@@ -289,7 +263,7 @@ const Home = () => {
             ) : (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan={5}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
                   Không có người dùng nào để hiển thị.
@@ -297,7 +271,8 @@ const Home = () => {
               </tr>
             )}
           </tbody>
-        </table>
+        </TableComponent>
+
         <PaginationComponent
           totalItems={totalItems}
           itemsPerPage={itemsPerPage}

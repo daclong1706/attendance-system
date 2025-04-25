@@ -1,14 +1,10 @@
 import { useState } from "react";
+import { FaSignOutAlt } from "react-icons/fa";
 import { LuPanelLeftOpen, LuPanelRightOpen } from "react-icons/lu";
-import {
-  MdAccountCircle,
-  MdAssessment,
-  MdCalendarMonth,
-  MdGroup,
-  MdSettings,
-  MdSpaceDashboard,
-} from "react-icons/md";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { icons } from "../../constant/icon";
+import { Button } from "flowbite-react";
+import { useAppSelector } from "../../store/hook";
 
 interface Props {
   isOpenSidebar: boolean;
@@ -17,66 +13,96 @@ interface Props {
 
 const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const role = "admin"; // Thay đổi role tùy người dùng
+  const user = useAppSelector((state) => state.auth.user);
+  const role = user?.role;
+  const navigate = useNavigate();
 
   const adminLinks = [
     {
-      path: "/",
+      path: "/admin/dashboard",
       label: "Dashboard",
-      icon: <MdSpaceDashboard className="h-5 w-5" />,
+      icon: icons.dashboard,
     },
     {
-      path: "/user-management",
+      path: "/admin/user-management",
       label: "Người dùng",
-      icon: <MdAccountCircle className="h-5 w-5" />,
+      icon: icons.userManagement,
     },
     {
-      path: "/class-management",
+      path: "/admin/class-management",
       label: "Lớp học",
-      icon: <MdGroup className="h-5 w-5" />,
+      icon: icons.classManagement,
     },
     {
-      path: "/schedule-management",
+      path: "/admin/schedule-management",
       label: "Thời khóa biểu",
-      icon: <MdCalendarMonth className="h-5 w-5" />,
+      icon: icons.scheduleManagement,
     },
     {
-      path: "/reports",
+      path: "/admin/reports",
       label: "Báo cáo",
-      icon: <MdAssessment className="h-5 w-5" />,
+      icon: icons.reports,
     },
     {
-      path: "/settings",
+      path: "/admin/settings",
       label: "Cài đặt",
-      icon: <MdSettings className="h-5 w-5" />,
+      icon: icons.settings,
     },
   ];
 
-  // const teacherLinks = [
-  //   { path: "/", label: "Dashboard" },
-  //   { path: "/attendance", label: "Điểm danh" },
-  //   { path: "/class-management", label: "Danh sách lớp" },
-  //   { path: "/schedule", label: "Thời khóa biểu" },
-  //   { path: "/reports", label: "Báo cáo lớp học" },
-  // ];
+  const teacherLinks = [
+    { path: "/teacher/dashboard", label: "Dashboard", icon: icons.dashboard },
+    { path: "/teacher/attendance", label: "Điểm danh", icon: icons.attendance },
+    {
+      path: "/teacher/class",
+      label: "Danh sách lớp",
+      icon: icons.classManagement,
+    },
+    {
+      path: "/teacher/schedule",
+      label: "Thời khóa biểu",
+      icon: icons.scheduleManagement,
+    },
+    { path: "/teacher/reports", label: "Báo cáo lớp học", icon: icons.reports },
+  ];
 
-  // const studentLinks = [
-  //   { path: "/", label: "Dashboard" },
-  //   { path: "/schedule", label: "Lịch học" },
-  //   { path: "/attendance-status", label: "Tình trạng điểm danh" },
-  //   { path: "/notifications", label: "Thông báo" },
-  //   { path: "/personal-report", label: "Báo cáo cá nhân" },
-  // ];
+  const studentLinks = [
+    { path: "/student/dashboard", label: "Dashboard", icon: icons.dashboard },
+    {
+      path: "/student/schedule",
+      label: "Lịch học",
+      icon: icons.scheduleManagement,
+    },
+    {
+      path: "/student/attendance-status",
+      label: "Tình trạng điểm danh",
+      icon: icons.attendance,
+    },
+    {
+      path: "/student/notifications",
+      label: "Thông báo",
+      icon: icons.notification,
+    },
+    {
+      path: "/student/personal-report",
+      label: "Báo cáo cá nhân",
+      icon: icons.reports,
+    },
+  ];
 
   const getLinks = () => {
     if (role === "admin") return adminLinks;
-    // if (role === "teacher") return teacherLinks;
-    // if (role === "student") return studentLinks;
+    if (role === "teacher") return teacherLinks;
+    if (role === "student") return studentLinks;
     return [];
   };
 
   const toggleSidebarCollapsed = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed); // Đổi trạng thái mở/thu nhỏ
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const handleLogout = () => {
+    navigate("/login");
   };
 
   return (
@@ -158,6 +184,14 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
               </NavLink>
             ))}
           </nav>
+          <div className="my-2">
+            <Button onClick={handleLogout} color="red" className="w-full">
+              <FaSignOutAlt
+                className={`${!isSidebarCollapsed ? "mr-2" : ""} h-5 w-5`}
+              />
+              {!isSidebarCollapsed && <span>Đăng xuất</span>}
+            </Button>
+          </div>
         </div>
       </div>
     </>

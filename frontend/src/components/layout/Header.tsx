@@ -9,12 +9,14 @@ import {
   NavbarBrand,
   NavbarToggle,
 } from "flowbite-react";
+import { useAppSelector } from "../../store/hook";
 
 interface Props {
   toggleSidebar: () => void;
 }
 
 const Header = ({ toggleSidebar }: Props) => {
+  const user = useAppSelector((state) => state.auth.user);
   return (
     <>
       <Navbar fluid rounded>
@@ -35,9 +37,9 @@ const Header = ({ toggleSidebar }: Props) => {
                   rounded
                 />
                 <div className="hidden flex-col items-start justify-center md:flex">
-                  <span className="block text-sm">Bonnie Green</span>
+                  <span className="block text-sm">{user?.name}</span>
                   <span className="block truncate text-sm font-medium">
-                    name@flowbite.com
+                    {user?.email}
                   </span>
                 </div>
               </div>

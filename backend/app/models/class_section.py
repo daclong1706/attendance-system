@@ -1,6 +1,5 @@
 from app.extensions import db
 
-
 class ClassSection(db.Model):
     __tablename__ = "class_sections"
     id = db.Column(db.Integer, primary_key=True)
@@ -16,7 +15,6 @@ class ClassSection(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     semester = db.Column(db.String(20), nullable=False)
     year = db.Column(db.Integer, nullable=False)
-
     subject = db.relationship("Subject", backref="class_sections")
     teacher = db.relationship("User", backref="teaching_classes")
 
