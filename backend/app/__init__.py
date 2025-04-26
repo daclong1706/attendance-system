@@ -2,7 +2,7 @@ from flask import Flask
 from config import Config
 from app.extensions import db, migrate, jwt, bcrypt
 from app.models import *
-from app.routes import auth_bp, subject_bp, user_bp, admin_bp, teacher_bp, debug_bp
+from app.routes import auth_bp, subject_bp, user_bp, admin_bp, teacher_bp, student_bp, debug_bp
 from flask_cors import CORS
 from datetime import timedelta
 
@@ -24,6 +24,7 @@ def create_app(config_class=Config):
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(teacher_bp, url_prefix='/teacher')
+    app.register_blueprint(student_bp, url_prefix='/student')
 
     app.register_blueprint(debug_bp, url_prefix='/debug')
 

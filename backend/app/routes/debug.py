@@ -32,3 +32,14 @@ def protected_teacher():
     # Access the authenticated user's ID from flask.g
     user_id = g.get("user_id")
     return jsonify({"message": f"Welcome, user {user_id}!"}), 200
+
+@debug_bp.route("/protected-student", methods=["POST"])
+@jwt_required_middleware
+def protected_student():
+    print(g.user_role)
+    if g.user_role != 'student':
+        return jsonify({"message": "Forbidden: Students only"}), 403
+
+    # Access the authenticated user's ID from flask.g
+    user_id = g.get("user_id")
+    return jsonify({"message": f"Welcome, user {user_id}!"}), 200
