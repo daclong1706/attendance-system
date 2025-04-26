@@ -16,3 +16,7 @@
   --color-primary-800: #42389d;
   --color-primary-900: #362f78;
 }
+
+#role {
+  height: 100% !important;
+}

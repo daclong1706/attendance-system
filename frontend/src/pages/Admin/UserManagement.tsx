@@ -1,10 +1,12 @@
 import { Button } from "flowbite-react";
-import { useEffect } from "react";
-import { AiOutlineSearch } from "react-icons/ai";
+import { useEffect, useState } from "react";
 import { FaEdit, FaEye, FaPlusSquare, FaTrashAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useTable } from "../../components/hook/useTable";
+import DeleteModal from "../../components/modal/DeleteModal";
+import LoadingModal from "../../components/modal/LoadingModal";
 import PaginationComponent from "../../components/ui/PanigationComponent";
+import SearchComponent from "../../components/ui/SearchComponent";
 import TableBodyComponent from "../../components/ui/table/TableBodyComponent";
 import TableCellComponent from "../../components/ui/table/TableCellComponent";
 import TableComponent from "../../components/ui/table/TableComponent";
@@ -13,14 +15,22 @@ import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
 import TableRowComponent from "../../components/ui/table/TableRowComponent";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { fetchAllUsers } from "../../store/slices/userReducer";
-import LoadingModal from "../../components/modal/LoadingModal";
-import SearchComponent from "../../components/ui/SearchComponent";
+import { User } from "../../types/userTypes";
+import CreateUserForm from "./CreateUserForm";
+import EditUserForm from "./EditUserForm";
+import ViewUserForm from "./ViewUserForm";
 
 const Home = () => {
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { users, loading, error } = useAppSelector((state) => state.user);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { users, loading } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchAllUsers());
@@ -37,7 +47,7 @@ const Home = () => {
     sortColumn,
     sortDirection,
   } = useTable({ data: users || [], itemsPerPage });
-  if (error) return <p>Lỗi: {error}</p>;
+
   return (
     <div className="mx-auto mt-4 max-w-6xl p-4 md:block">
       <div className="overflow-x-auto sm:rounded-lg">
@@ -48,7 +58,7 @@ const Home = () => {
           />
 
           <div className="mr-2">
-            <Button color="green">
+            <Button color="green" onClick={() => setIsCreateOpen(true)}>
               <FaPlusSquare className="mr-2 h-5 w-5" />
               Tài khoản
             </Button>
@@ -99,7 +109,7 @@ const Home = () => {
                 >
                   <TableCellComponent
                     className="rounded-l-xl border-l-2"
-                    title={user.id}
+                    title={user.id.toString()}
                   >
                     {user.id}
                   </TableCellComponent>
@@ -134,13 +144,31 @@ const Home = () => {
 
                   <TableCellComponent className="rounded-r-xl border-r-2">
                     <div className="flex flex-row items-center justify-center gap-3">
-                      <button className="cursor-pointer text-neutral-400 hover:text-blue-400">
+                      <button
+                        className="cursor-pointer text-neutral-400 hover:text-blue-400"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setIsViewOpen(true);
+                        }}
+                      >
                         <FaEye className="h-5 w-5" />
                       </button>
-                      <button className="cursor-pointer text-neutral-400 hover:text-green-400">
+                      <button
+                        className="cursor-pointer text-neutral-400 hover:text-green-400"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setIsEditOpen(true);
+                        }}
+                      >
                         <FaEdit className="h-5 w-5" />
                       </button>
-                      <button className="cursor-pointer text-neutral-400 hover:text-red-400">
+                      <button
+                        className="cursor-pointer text-neutral-400 hover:text-red-400"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setIsDeleteOpen(true);
+                        }}
+                      >
                         <FaTrashAlt className="h-4 w-4" />
                       </button>
                     </div>
@@ -168,6 +196,33 @@ const Home = () => {
         />
       </div>
       <LoadingModal isOpen={loading} />
+      <CreateUserForm
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
+      {selectedUser && (
+        <DeleteModal
+          userName={selectedUser.name}
+          userID={selectedUser.id}
+          openModal={isDeleteOpen}
+          setOpenModal={setIsDeleteOpen}
+        />
+      )}
+      {selectedUser && (
+        <EditUserForm
+          user={selectedUser}
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
+      \
+      {selectedUser && (
+        <ViewUserForm
+          user={selectedUser}
+          openModal={isViewOpen}
+          setOpenModal={setIsViewOpen}
+        />
+      )}
     </div>
   );
 };

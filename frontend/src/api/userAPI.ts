@@ -1,22 +1,7 @@
-import { AuthResponse } from "../types/authTypes";
 import { User } from "../types/userTypes";
 import axiosClient from "./axiosClient";
 
 class UserAPI {
-  //   async login(email: string, password: string): Promise<AuthResponse> {
-  //     try {
-  //       const response = await axiosClient.post<AuthResponse>("/auth/login", {
-  //         email,
-  //         password,
-  //       });
-  //       localStorage.setItem("auth", JSON.stringify(response.data));
-  //       return response.data;
-  //     } catch (error) {
-  //       console.log(error);
-  //       throw error;
-  //     }
-  //   }
-
   async getAllUser(): Promise<User[]> {
     try {
       const response = await axiosClient.get<User[]>("/user/getAllUser");
@@ -36,6 +21,44 @@ class UserAPI {
       return response.data;
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+
+  async createUser(userData: Partial<User>): Promise<User> {
+    try {
+      const response = await axiosClient.post<{ data: User }>(
+        "/user/create",
+        userData,
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async deleteUser(userId: number): Promise<{ message: string }> {
+    try {
+      const response = await axiosClient.delete<{ message: string }>(
+        `/user/${userId}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async updateUser(userId: number, updatedData: Partial<User>): Promise<User> {
+    try {
+      const response = await axiosClient.put<User>(
+        `/user/${userId}`,
+        updatedData,
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
       throw error;
     }
   }
