@@ -1,4 +1,3 @@
-
 from seed import (
     runUser,
     runSubject,
@@ -17,7 +16,5 @@ def run():
     runAttendanceSession()
     runAttendance()
     print("Đã thêm tất cả dữ liệu thành công!")
-
-
 if __name__ == "__main__":
     run()
