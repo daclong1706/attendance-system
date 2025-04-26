@@ -34,9 +34,9 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
       icon: icons.classManagement,
     },
     {
-      path: "/admin/schedule-management",
-      label: "Thời khóa biểu",
-      icon: icons.scheduleManagement,
+      path: "/admin/subject-management",
+      label: "Học phần",
+      icon: icons.subject,
     },
     {
       path: "/admin/reports",
@@ -187,7 +187,7 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
           <div className="my-2">
             <Button onClick={handleLogout} color="red" className="w-full">
               <FaSignOutAlt
-                className={`${!isSidebarCollapsed ? "mr-2" : ""} h-5 w-5`}
+                className={`${!isSidebarCollapsed ? "mr-2" : ""} h-5 w-5 rotate-180`}
               />
               {!isSidebarCollapsed && <span>Đăng xuất</span>}
             </Button>

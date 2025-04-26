@@ -14,6 +14,7 @@ import ScheduleStudent from "./pages/Student/ScheduleStudent";
 import ClassManagement from "./pages/Admin/ClassManagement";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import SubjectManagement from "./pages/Admin/SubjectManagement";
 
 export default function App() {
   return (
@@ -68,7 +69,10 @@ export default function App() {
               <Route path="user-management" element={<UserManagement />} />
               <Route path="attendance" element={<Attendance />} />
               <Route path="class-management" element={<ClassManagement />} />
-              {/* <Route path="/schedule" element={<SchedulePage />} /> */}
+              <Route
+                path="subject-management"
+                element={<SubjectManagement />}
+              />
             </Route>
           </Routes>
         </BrowserRouter>

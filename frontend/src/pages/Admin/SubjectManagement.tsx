@@ -1,4 +1,4 @@
-import { AiOutlineSearch } from "react-icons/ai";
+import { useEffect, useState } from "react";
 import { FaPlusSquare } from "react-icons/fa";
 import { useTable } from "../../components/hook/useTable";
 import PaginationComponent from "../../components/ui/PanigationComponent";
@@ -9,28 +9,29 @@ import TableHeadCellComponent from "../../components/ui/table/TableHeadCellCompo
 import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
 import TableRowComponent from "../../components/ui/table/TableRowComponent";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { useEffect, useState } from "react";
-import { Class } from "../../types/classType";
-import { fetchAllClasses } from "../../store/slices/classReducer";
-import LoadingModal from "../../components/modal/LoadingModal";
-import ActionComponent from "../../components/ui/ActionComponent";
-import { Button } from "flowbite-react";
-import SearchComponent from "../../components/ui/SearchComponent";
 
-const ClassManagement = () => {
+import { Button } from "flowbite-react";
+import LoadingModal from "../../components/modal/LoadingModal";
+import SearchComponent from "../../components/ui/SearchComponent";
+import { fetchAllSubjects } from "../../store/slices/subjectReducer";
+import { Subject } from "../../types/subjectType";
+import ActionComponent from "../../components/ui/ActionComponent";
+import DeleteModal from "../../components/modal/DeleteModal";
+
+const SubjectManagement = () => {
   const itemsPerPage = 10;
 
   const dispatch = useAppDispatch();
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const { classes, loading } = useAppSelector((state) => state.class);
+  const { subjects, loading } = useAppSelector((state) => state.subject);
 
   useEffect(() => {
-    dispatch(fetchAllClasses());
+    dispatch(fetchAllSubjects());
   }, [dispatch]);
 
   const {
@@ -43,7 +44,7 @@ const ClassManagement = () => {
     handleSort,
     sortColumn,
     sortDirection,
-  } = useTable({ data: classes || [], itemsPerPage });
+  } = useTable({ data: subjects || [], itemsPerPage });
 
   return (
     <div className="mx-auto hidden max-w-6xl p-4 md:block">
@@ -57,7 +58,7 @@ const ClassManagement = () => {
           <div className="mr-2">
             <Button color="green" onClick={() => setIsCreateOpen(true)}>
               <FaPlusSquare className="mr-2 h-5 w-5" />
-              Lớp học
+              Học phần
             </Button>
           </div>
         </div>
@@ -71,27 +72,16 @@ const ClassManagement = () => {
                 className="w-[150px] rounded-l-xl"
               />
               <TableHeadCellComponent
-                columnName="subject_code"
+                columnName="code"
                 label="Mã Học Phần"
+                onSort={() => handleSort("code")}
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
               />
               <TableHeadCellComponent
-                columnName="subject_name"
+                columnName="name"
                 label="Học phần"
-                onSort={() => handleSort("subject_name")}
-                sortColumn={sortColumn}
-                sortDirection={sortDirection}
-              />
-              <TableHeadCellComponent
-                columnName="teacher_name"
-                label="Giảng viên"
-                onSort={() => handleSort("teacher_name")}
-                sortColumn={sortColumn}
-                sortDirection={sortDirection}
-              />
-              <TableHeadCellComponent
-                columnName="student_count"
-                label="Số lượng"
-                onSort={() => handleSort("student_count")}
+                onSort={() => handleSort("name")}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
               />
@@ -111,14 +101,12 @@ const ClassManagement = () => {
                   <TableCellComponent className="rounded-l-xl border-l-2">
                     {d.id}
                   </TableCellComponent>
-                  <TableCellComponent>{d.subject_code}</TableCellComponent>
-                  <TableCellComponent>{d.subject_name}</TableCellComponent>
-                  <TableCellComponent>{d.teacher_name}</TableCellComponent>
-                  <TableCellComponent>{d.student_count}</TableCellComponent>
+                  <TableCellComponent>{d.code}</TableCellComponent>
+                  <TableCellComponent>{d.name}</TableCellComponent>
                   <TableCellComponent className="rounded-r-xl border-r-2">
                     <ActionComponent
                       data={d}
-                      setSelectedData={setSelectedClass}
+                      setSelectedData={setSelectedSubject}
                       setIsViewOpen={setIsViewOpen}
                       setIsEditOpen={setIsEditOpen}
                       setIsDeleteOpen={setIsDeleteOpen}
@@ -132,7 +120,7 @@ const ClassManagement = () => {
                   colSpan={5}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
-                  Không có lớp học nào để hiển thị.
+                  Không có học phần nào để hiển thị.
                 </td>
               </tr>
             )}
@@ -147,8 +135,16 @@ const ClassManagement = () => {
         />
       </div>
       <LoadingModal isOpen={loading} />
+      {selectedSubject && (
+        <DeleteModal
+          userName={selectedSubject.name}
+          userID={selectedSubject.id}
+          openModal={isDeleteOpen}
+          setOpenModal={setIsDeleteOpen}
+        />
+      )}
     </div>
   );
 };
 
-export default ClassManagement;
+export default SubjectManagement;

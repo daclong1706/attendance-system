@@ -1,6 +1,5 @@
 import { Button } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { FaEdit, FaEye, FaPlusSquare, FaTrashAlt } from "react-icons/fa";
 // import { useNavigate } from "react-router-dom";
 import { useTable } from "../../components/hook/useTable";
 import DeleteModal from "../../components/modal/DeleteModal";
@@ -19,6 +18,8 @@ import { User } from "../../types/userTypes";
 import CreateUserForm from "./CreateUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserForm from "./ViewUserForm";
+import ActionComponent from "../../components/ui/ActionComponent";
+import { FaPlusSquare } from "react-icons/fa";
 
 const Home = () => {
   const itemsPerPage = 10;
@@ -143,35 +144,13 @@ const Home = () => {
                   <TableCellComponent>{user.role}</TableCellComponent>
 
                   <TableCellComponent className="rounded-r-xl border-r-2">
-                    <div className="flex flex-row items-center justify-center gap-3">
-                      <button
-                        className="cursor-pointer text-neutral-400 hover:text-blue-400"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsViewOpen(true);
-                        }}
-                      >
-                        <FaEye className="h-5 w-5" />
-                      </button>
-                      <button
-                        className="cursor-pointer text-neutral-400 hover:text-green-400"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsEditOpen(true);
-                        }}
-                      >
-                        <FaEdit className="h-5 w-5" />
-                      </button>
-                      <button
-                        className="cursor-pointer text-neutral-400 hover:text-red-400"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsDeleteOpen(true);
-                        }}
-                      >
-                        <FaTrashAlt className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <ActionComponent<User>
+                      data={user}
+                      setSelectedData={setSelectedUser}
+                      setIsViewOpen={setIsViewOpen}
+                      setIsEditOpen={setIsEditOpen}
+                      setIsDeleteOpen={setIsDeleteOpen}
+                    />
                   </TableCellComponent>
                 </TableRowComponent>
               ))
