@@ -1,0 +1,62 @@
+CREATE DATABASE attendance_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE attendance_system;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    mssv VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('student', 'teacher', 'admin') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subjects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(20) NOT NULL UNIQUE
+);
+
+CREATE TABLE class_sections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT NOT NULL,
+    teacher_id INT NOT NULL,
+    room VARCHAR(100) NOT NULL,
+    day_of_week TINYINT NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    semester VARCHAR(20) NOT NULL,
+    year INT NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    FOREIGN KEY (teacher_id) REFERENCES users(id)
+);
+
+CREATE TABLE enrollments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    class_section_id INT NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES users(id),
+    FOREIGN KEY (class_section_id) REFERENCES class_sections(id),
+    UNIQUE (student_id, class_section_id)
+);
+
+CREATE TABLE attendance_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    class_session_id INT NOT NULL,
+    date DATE NOT NULL,
+    qr_code_start TEXT NOT NULL,
+    qr_code_end TEXT NOT NULL,
+    FOREIGN KEY (class_session_id) REFERENCES class_sections(id),
+    UNIQUE (class_session_id, date)
+);
+
+CREATE TABLE attendances (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    attendance_session_id INT NOT NULL,
+    status ENUM('present', 'absent', 'late', 'leave') DEFAULT 'present',
+    checked_at DATETIME,
+    FOREIGN KEY (student_id) REFERENCES users(id),
+    FOREIGN KEY (attendance_session_id) REFERENCES attendance_sessions(id),
+    UNIQUE (student_id, attendance_session_id)
+);
