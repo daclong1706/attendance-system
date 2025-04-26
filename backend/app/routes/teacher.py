@@ -56,17 +56,15 @@ def get_teacher_classes():
     ).all()
 
     return jsonify({
-        "data": {
-            "classes": [
-                {
-                    "id": cs.id,
-                    "subject_name": cs.subject_name,
-                    "subject_code": cs.subject_code,
-                    "student_count": cs.student_count
-                }
-                for cs in class_sections
-            ]
-        }
+        "data": [
+            {
+                "id": cs.id,
+                "subject_name": cs.subject_name,
+                "subject_code": cs.subject_code,
+                "student_count": cs.student_count
+            }
+            for cs in class_sections
+        ]
     }), 200
 
 @teacher_bp.route("/classes/<int:class_section_id>", methods=["GET"])

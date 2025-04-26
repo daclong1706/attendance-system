@@ -8,43 +8,32 @@ import TableComponent from "../../components/ui/table/TableComponent";
 import TableHeadCellComponent from "../../components/ui/table/TableHeadCellComponent";
 import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
 import TableRowComponent from "../../components/ui/table/TableRowComponent";
-
-const data = [
-  {
-    id: "IT101",
-    name: "Khoa học máy tính",
-    lecturer: "Nguyễn Văn A",
-    semester: "HK2 - 2025",
-    student_count: 45,
-    status: "Đang học",
-    students: [
-      { student_id: "SV001", name: "Phạm Minh Anh", status: "Có mặt" },
-      { student_id: "SV002", name: "Nguyễn Thị Lan", status: "Vắng mặt" },
-      { student_id: "SV003", name: "Trần Quốc Đạt", status: "Có mặt" },
-      { student_id: "SV004", name: "Đỗ Hoài Nam", status: "Muộn" },
-    ],
-  },
-  {
-    id: "IT202",
-    name: "Công nghệ thông tin",
-    lecturer: "Trần Bích Ngọc",
-    semester: "HK1 - 2025",
-    student_count: 38,
-    status: "Đang học",
-    students: [
-      { student_id: "SV005", name: "Lê Văn Hưng", status: "Có mặt" },
-      { student_id: "SV006", name: "Trần Thị Mai", status: "Có mặt" },
-      { student_id: "SV007", name: "Ngô Hoàng Phúc", status: "Vắng mặt" },
-      { student_id: "SV008", name: "Phan Thị Thảo", status: "Muộn" },
-    ],
-  },
-];
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { useEffect, useState } from "react";
+import { fetchAllClassesByTeacher } from "../../store/slices/teacherReducer";
+import SearchComponent from "../../components/ui/SearchComponent";
+import { Button } from "flowbite-react";
+import ActionComponent from "../../components/ui/ActionComponent";
+import LoadingModal from "../../components/modal/LoadingModal";
 
 const ClassList = () => {
   const itemsPerPage = 10;
 
+  const dispatch = useAppDispatch();
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { classes, loading } = useAppSelector((state) => state.teacher);
+
+  useEffect(() => {
+    dispatch(fetchAllClassesByTeacher());
+  }, [dispatch]);
+
   const {
-    paginatedData: classes,
+    paginatedData: data,
     totalItems,
     currentPage,
     setCurrentPage,
@@ -53,41 +42,17 @@ const ClassList = () => {
     handleSort,
     sortColumn,
     sortDirection,
-  } = useTable({ data: data || [], itemsPerPage });
-
-  console.log(classes);
+  } = useTable({ data: classes || [], itemsPerPage });
 
   return (
     <div className="mx-auto hidden max-w-6xl p-4 md:block">
       <div className="overflow-x-auto sm:rounded-lg">
-        <div className="mb-6 flex flex-row justify-between">
-          <label htmlFor="search">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Tìm kiếm lớp học"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-xl border-2 border-[#e7e7e7] bg-white px-4 py-2 pr-12 placeholder:text-neutral-400 focus:border-indigo-500 focus:outline-none"
-              />
-
-              {/* Search Icon */}
-              <button
-                type="submit"
-                className="absolute top-1/2 right-2 -translate-y-1/2 transform text-gray-600 hover:text-gray-800"
-              >
-                <AiOutlineSearch className="h-6 w-6" />
-              </button>
-            </div>
-          </label>
-          {/* <Link to="add-book" className="font-medium uppercase"> */}
-          <div>
-            <button className="bg-create-100 hover:bg-create-200 flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-white">
-              <FaPlusSquare className="h-5 w-5" />
-              Sách
-            </button>
-          </div>
-          {/* </Link> */}
+        <div className="mt-2 mb-6 flex flex-row justify-between">
+          <SearchComponent
+            title="Tìm kiếm học phần"
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
         </div>
 
         <TableComponent>
@@ -95,26 +60,23 @@ const ClassList = () => {
             <TableRowComponent>
               <TableHeadCellComponent
                 columnName="id"
-                label="Mã Học Phần"
+                label="ID"
                 className="w-[150px] rounded-l-xl"
               />
               <TableHeadCellComponent
-                columnName="name"
-                label="Học phần"
-                onSort={() => handleSort("name")}
-                sortColumn={sortColumn}
-                sortDirection={sortDirection}
+                columnName="subject_code"
+                label="Mã Học Phần"
               />
               <TableHeadCellComponent
-                columnName="lecturer"
-                label="Giảng viên"
-                onSort={() => handleSort("lecturer")}
+                columnName="subject_name"
+                label="Học phần"
+                onSort={() => handleSort("subject_name")}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
               />
               <TableHeadCellComponent
                 columnName="student_count"
-                label="Số lượng"
+                label="Số lượng sinh viên"
                 onSort={() => handleSort("student_count")}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
@@ -126,23 +88,26 @@ const ClassList = () => {
             </TableRowComponent>
           </TableHeadComponent>
           <TableBodyComponent>
-            {classes.length > 0 ? (
-              classes.map((c) => (
+            {data.length > 0 ? (
+              data.map((d) => (
                 <TableRowComponent
-                  key={c.id}
+                  key={d.id}
                   className="bg-gray-50 hover:bg-indigo-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
                 >
                   <TableCellComponent className="rounded-l-xl border-l-2">
-                    {c.id}
+                    {d.id}
                   </TableCellComponent>
-                  <TableCellComponent>{c.name}</TableCellComponent>
-                  <TableCellComponent>{c.lecturer}</TableCellComponent>
-                  <TableCellComponent>{c.student_count}</TableCellComponent>
+                  <TableCellComponent>{d.subject_code}</TableCellComponent>
+                  <TableCellComponent>{d.subject_name}</TableCellComponent>
+                  <TableCellComponent>{d.student_count}</TableCellComponent>
                   <TableCellComponent className="rounded-r-xl border-r-2">
-                    <div className="flex flex-row items-center justify-center gap-3">
-                      <button className="cursor-pointer text-neutral-400 hover:text-blue-400"></button>
-                      <button className="cursor-pointer text-neutral-400 hover:text-green-400"></button>
-                    </div>
+                    <ActionComponent
+                      data={d}
+                      setSelectedData={setSelectedClass}
+                      setIsViewOpen={setIsViewOpen}
+                      setIsEditOpen={setIsEditOpen}
+                      setIsDeleteOpen={setIsDeleteOpen}
+                    />
                   </TableCellComponent>
                 </TableRowComponent>
               ))
@@ -152,7 +117,7 @@ const ClassList = () => {
                   colSpan={5}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
-                  Không có người dùng nào để hiển thị.
+                  Không có lớp học nào để hiển thị.
                 </td>
               </tr>
             )}
@@ -166,6 +131,7 @@ const ClassList = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
+      <LoadingModal isOpen={loading} />
     </div>
   );
 };

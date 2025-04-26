@@ -50,6 +50,7 @@ const ClassManagement = () => {
       <div className="overflow-x-auto sm:rounded-lg">
         <div className="mt-2 mb-6 flex flex-row justify-between">
           <SearchComponent
+            title="Tìm kiếm lớp học"
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />

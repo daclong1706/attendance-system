@@ -54,6 +54,7 @@ const Home = () => {
       <div className="overflow-x-auto sm:rounded-lg">
         <div className="mt-2 mb-6 flex flex-row justify-between">
           <SearchComponent
+            title="Tìm kiếm người dùng"
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />

@@ -27,7 +27,7 @@ export const fetchAllSubjects = createAsyncThunk<Subject[], void>(
 );
 
 const subjectSlice = createSlice({
-  name: "user",
+  name: "subject",
   initialState,
   reducers: {
     resetSubjects: (state) => {

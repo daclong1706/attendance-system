@@ -51,6 +51,7 @@ const SubjectManagement = () => {
       <div className="overflow-x-auto sm:rounded-lg">
         <div className="mt-2 mb-6 flex flex-row justify-between">
           <SearchComponent
+            title="Tìm kiếm học phần"
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />

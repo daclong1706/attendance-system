@@ -1,24 +1,24 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Class } from "../../types/classType";
-import classAPI from "../../api/classAPI";
+import teacherAPI from "../../api/teacherAPI";
 
-interface ClassState {
+interface TeacherState {
   classes: Class[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: ClassState = {
+const initialState: TeacherState = {
   classes: [],
   loading: false,
   error: null,
 };
 
-export const fetchAllClasses = createAsyncThunk<Class[], void>(
-  "class/fetchAllClasses",
+export const fetchAllClassesByTeacher = createAsyncThunk<Class[], void>(
+  "class/fetchAllClassesByTeacher",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await classAPI.getClass();
+      const response = await teacherAPI.getAllClass();
       return response;
     } catch (error) {
       return rejectWithValue(error);
@@ -26,8 +26,8 @@ export const fetchAllClasses = createAsyncThunk<Class[], void>(
   },
 );
 
-const classSlice = createSlice({
-  name: "class",
+const teacherSlice = createSlice({
+  name: "teacher",
   initialState,
   reducers: {
     resetClasses: (state) => {
@@ -36,18 +36,18 @@ const classSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAllClasses.pending, (state) => {
+      .addCase(fetchAllClassesByTeacher.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(
-        fetchAllClasses.fulfilled,
+        fetchAllClassesByTeacher.fulfilled,
         (state, action: PayloadAction<Class[]>) => {
           state.loading = false;
           state.classes = action.payload;
         },
       )
-      .addCase(fetchAllClasses.rejected, (state, action) => {
+      .addCase(fetchAllClassesByTeacher.rejected, (state, action) => {
         state.loading = false;
         state.error =
           (action.payload as string) || "Không thể tải danh sách lớp!";
@@ -55,5 +55,5 @@ const classSlice = createSlice({
   },
 });
 
-export const { resetClasses } = classSlice.actions;
-export default classSlice.reducer;
+export const { resetClasses } = teacherSlice.actions;
+export default teacherSlice.reducer;
