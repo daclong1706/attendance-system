@@ -36,14 +36,12 @@ def create_user():
 
     return jsonify({
         "data": {
-            "user": {
-                "id": new_user.id,
-                "name": new_user.name,
-                "email": new_user.email,
-                "mssv": new_user.mssv,
-                "role": new_user.role,
-                "created_at": new_user.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            }
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email,
+            "mssv": new_user.mssv,
+            "role": new_user.role,
+            "created_at": new_user.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
     }), 201
 

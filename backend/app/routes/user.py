@@ -7,19 +7,17 @@ user_bp = Blueprint("user_bp", __name__)
 def get_all_users():
     users = User.query.all()
     return jsonify({
-        "data": {
-            "users": [
-                {
-                    "id": user.id,
-                    "name": user.name,
-                    "email": user.email,
-                    "mssv": user.mssv,
-                    "role": user.role,
-                    "created_at": user.created_at.strftime('%Y-%m-%d %H:%M:%S')
-                }
-                for user in users
-            ]
-        }
+        "data": [
+            {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "mssv": user.mssv,
+                "role": user.role,
+                "created_at": user.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            for user in users
+        ]
     }), 200
 
 @user_bp.route("/getUserInformation", methods=["GET"])

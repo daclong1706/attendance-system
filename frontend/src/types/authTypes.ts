@@ -1,9 +1,4 @@
-export interface User {
-  id: number;
-  email: string;
-  role: string;
-  name: string;
-}
+import { User } from "./userTypes";
 
 export interface AuthResponse {
   access_token: string;
