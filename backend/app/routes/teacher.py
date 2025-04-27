@@ -8,7 +8,6 @@ from app.models.attendance import Attendance, AttendanceLog, AttendanceSession
 from app.middlewares.auth_middleware import jwt_required_middleware
 from app.extensions import db, bcrypt
 from app.utils import generate_random_code
-from datetime import datetime
 
 teacher_bp = Blueprint("teacher_bp", __name__)
 
@@ -249,6 +248,11 @@ def create_attendance_session():
 @teacher_bp.route("/attendance-session/<int:attendance_session_id>/update", methods=["PUT"])
 @jwt_required_middleware
 def update_attendance_status(attendance_session_id):
+    if g.user_role != "teacher":
+        return jsonify({"message": "Forbidden: Teachers only"}), 403
+
+    data = request.get_json()
+    
     updates = data.get("updates", [])  # Expecting a list of updates
     if not updates:
         return jsonify({"message": "No updates provided"}), 400
@@ -281,15 +285,14 @@ def update_attendance_status(attendance_session_id):
         "data": updated_attendances
     }), 200
 
-
-from datetime import datetime
-from flask import jsonify, request, g
-from app.extensions import db
-from app.models import ClassSection, Subject, Enrollment, AttendanceSession, Attendance
-
 @teacher_bp.route("/attendance", methods=["POST"])
 @jwt_required_middleware
 def get_class_attendance():
+    if g.user_role != "teacher":
+        return jsonify({"message": "Forbidden: Teachers only"}), 403
+
+    data = request.get_json()
+    
     print("Dữ liệu nhận được:", data)
 
     class_section_id = data.get("class_section_id")
