@@ -2,12 +2,11 @@ import { saveAs } from "file-saver";
 import {
   Button,
   Checkbox,
-  Datepicker,
   Dropdown,
   DropdownItem,
+  Select,
 } from "flowbite-react";
-import { useEffect, useState } from "react";
-import { AiOutlineSearch } from "react-icons/ai";
+import { useEffect, useMemo, useState } from "react";
 import { MdQrCode2 } from "react-icons/md";
 import { TbFaceId } from "react-icons/tb";
 import * as XLSX from "xlsx";
@@ -15,198 +14,53 @@ import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
 import FaceAttendance from "../Attendance/FaceAttendance";
 import QRAttendance from "../Attendance/QRAttendance";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { fetchAllClassesByTeacher } from "../../store/slices/teacherReducer";
+import {
+  fetchAllClassesByTeacher,
+  fetchAttendanceByClass,
+  saveAttendance,
+} from "../../store/slices/teacherReducer";
 import LoadingModal from "../../components/modal/LoadingModal";
+import { Class } from "../../types/classType";
+import { Attendance } from "../../types/attendanceTypes";
+import SearchComponent from "../../components/ui/SearchComponent";
+import { getMatchingDates } from "../../helper/scheduleHelper";
 
-const fakeUsers = [
-  {
-    id: 1,
-    studentId: "48.01.104.001",
-    name: "Nguyễn Văn A",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 2,
-    studentId: "48.01.104.002",
-    name: "Trần Thị B",
-    status: "absent",
-    time: Date.now(),
-  },
-  {
-    id: 3,
-    studentId: "48.01.104.003",
-    name: "Lê Hoàng C",
-    status: "late",
-    time: Date.now(),
-  },
-  {
-    id: 4,
-    studentId: "48.01.104.004",
-    name: "Phạm Minh D",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 5,
-    studentId: "48.01.104.005",
-    name: "Bùi Thanh E",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 6,
-    studentId: "48.01.104.006",
-    name: "Đặng Quang F",
-    status: "absent",
-    time: Date.now(),
-  },
-  {
-    id: 7,
-    studentId: "48.01.104.007",
-    name: "Hoàng Anh G",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 8,
-    studentId: "48.01.104.008",
-    name: "Ngô Thị H",
-    status: "late",
-    time: Date.now(),
-  },
-  {
-    id: 9,
-    studentId: "48.01.104.009",
-    name: "Vũ Văn I",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 10,
-    studentId: "48.01.104.010",
-    name: "Đỗ Khánh J",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 11,
-    studentId: "48.01.104.011",
-    name: "Phan Tuấn K",
-    status: "absent",
-    time: Date.now(),
-  },
-  {
-    id: 12,
-    studentId: "48.01.104.012",
-    name: "Lâm Thanh L",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 13,
-    studentId: "48.01.104.013",
-    name: "Nguyễn Thị M",
-    status: "late",
-    time: Date.now(),
-  },
-  {
-    id: 14,
-    studentId: "48.01.104.014",
-    name: "Trần Văn N",
-    status: "absent",
-    time: Date.now(),
-  },
-  {
-    id: 15,
-    studentId: "48.01.104.015",
-    name: "Đinh Hữu O",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 16,
-    studentId: "48.01.104.016",
-    name: "Phạm Hoàng P",
-    status: "late",
-    time: Date.now(),
-  },
-  {
-    id: 17,
-    studentId: "48.01.104.017",
-    name: "Bùi Quang Q",
-    status: "present",
-    time: Date.now(),
-  },
-  {
-    id: 18,
-    studentId: "48.01.104.018",
-    name: "Nguyễn Thùy R",
-    status: "absent",
-    time: Date.now(),
-  },
-  {
-    id: 19,
-    studentId: "48.01.104.019",
-    name: "Võ Minh S",
-    status: "late",
-    time: Date.now(),
-  },
-  {
-    id: 20,
-    studentId: "48.01.104.020",
-    name: "Đào Văn T",
-    status: "present",
-    time: Date.now(),
-  },
-];
-const Attendance = () => {
-  const [users, setUsers] = useState(fakeUsers);
+const AttendanceTeacher = () => {
+  const dispatch = useAppDispatch();
+  const { classes, loading, attendanceList } = useAppSelector(
+    (state) => state.teacher,
+  );
+
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isFaceModalOpen, setIsFaceModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const totalPresent = users.filter((user) => user.status === "present").length;
-  const totalAbsent = users.filter((user) => user.status === "absent").length;
-  const totalLate = users.filter((user) => user.status === "late").length;
-
-  // Hàm thay đổi trạng thái điểm danh
-  const handleStatusChange = (id: number, newStatus: string) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === id ? { ...user, status: newStatus } : user,
-      ),
-    );
-  };
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.studentId.includes(searchTerm),
+  const [selectedClass, setSelectedClass] = useState<Class | null>(classes[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split("T")[0],
   );
 
-  const handleSaveAttendance = () => {
-    const attendanceData = users.map((user) => ({
-      studentId: user.studentId,
-      name: user.name,
-      status: user.status,
-    }));
+  useEffect(() => {
+    dispatch(fetchAllClassesByTeacher());
+    setUsers(attendanceList);
+  }, [dispatch, attendanceList]);
 
-    fetch("/api/attendance/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(attendanceData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        showSuccessMessage("Dữ liệu được lưu thành công");
-      })
-      .catch(() => showErrorMessage("Lỗi khi lưu dữ liệu"));
-  };
+  useEffect(() => {
+    if (selectedClass) {
+      const dayOfWeek = new Date(selectedDate).getDay();
+      dispatch(
+        fetchAttendanceByClass({
+          class_section_id: selectedClass.id,
+          selected_date: selectedDate,
+          day_of_week: dayOfWeek,
+        }),
+      );
+    }
+  }, [selectedClass, selectedDate, dispatch]);
+
+  const openQRModal = () => setIsQRModalOpen(true);
+  const closeQRModal = () => setIsQRModalOpen(false);
+  const openFaceModal = () => setIsFaceModalOpen(true);
+  const closeFaceModal = () => setIsFaceModalOpen(false);
 
   const handleExportData = () => {
     const worksheet = XLSX.utils.json_to_sheet(users);
@@ -225,41 +79,116 @@ const Attendance = () => {
 
   const handleMarkAllPresent = () => {
     setUsers((prevUsers) =>
-      prevUsers.map((user) => ({ ...user, status: "present" })),
+      prevUsers.map((user) => ({ ...user, attendance_status: "present" })),
     );
   };
 
-  const dispatch = useAppDispatch();
+  const matchedDates = useMemo(() => {
+    if (!selectedClass) return [];
 
-  const { classes, loading } = useAppSelector((state) => state.teacher);
+    return getMatchingDates(
+      selectedClass.start_date,
+      selectedClass.end_date,
+      selectedClass.day_of_week,
+    );
+  }, [selectedClass]);
 
-  useEffect(() => {
-    dispatch(fetchAllClassesByTeacher());
-  }, [dispatch]);
+  const [users, setUsers] = useState<Attendance[]>(attendanceList);
 
-  const openQRModal = () => setIsQRModalOpen(true);
-  const closeQRModal = () => setIsQRModalOpen(false);
-  const openFaceModal = () => setIsFaceModalOpen(true);
-  const closeFaceModal = () => setIsFaceModalOpen(false);
+  const totalPresent = users.filter(
+    (user) => user.attendance_status === "present",
+  ).length;
+  const totalAbsent = users.filter(
+    (user) => user.attendance_status === "absent",
+  ).length;
+  const totalExcusedAbsence = users.filter(
+    (user) => user.attendance_status === "excused_absence",
+  ).length;
+  const totalLate = users.filter(
+    (user) => user.attendance_status === "late",
+  ).length;
 
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.mssv.includes(searchTerm),
+  );
+
+  // Hàm thay đổi trạng thái điểm danh
+  const handleStatusChange = (
+    id: number,
+    newStatus:
+      | "present"
+      | "absent"
+      | "excused_absence"
+      | "late"
+      | "not_recorded",
+  ) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === id ? { ...user, attendance_status: newStatus } : user,
+      ),
+    );
+  };
+
+  const handleSaveAttendance = () => {
+    try {
+      if (selectedClass) {
+        const dayOfWeek = new Date(selectedDate).getDay();
+        const attendanceData = users.map((user) => ({
+          id: user.id,
+          status: user.attendance_status,
+        }));
+        dispatch(
+          saveAttendance({
+            class_section_id: selectedClass.id,
+            selected_date: selectedDate,
+            day_of_week: dayOfWeek,
+            students: attendanceData,
+          }),
+        );
+      }
+      showSuccessMessage("Thông tin điểm danh đã được lưu");
+    } catch {
+      showErrorMessage("Không thể lưu thông tin điểm danh");
+    }
+  };
 
   return (
     <section className="my-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        {/* Khu vực Datepicker, Dropdown và Search (chuyển xuống dưới trên màn hình nhỏ) */}
         <div className="flex w-full flex-wrap items-center gap-2 md:w-auto md:flex-nowrap md:items-center md:justify-start">
-          <div>
-            <Datepicker />
+          {/* Date */}
+          <div className="w-48 max-w-md">
+            <Select
+              id="dates"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              required
+            >
+              {matchedDates.length > 0 ? (
+                matchedDates.map((date) => (
+                  <option key={date} value={date}>
+                    {date}
+                  </option>
+                ))
+              ) : (
+                <option disabled>Không có ngày phù hợp</option>
+              )}
+            </Select>
           </div>
-          <Dropdown label={selectedClass || "Chọn lớp"}>
+
+          {/* Class */}
+          <Dropdown
+            label={selectedClass ? selectedClass.subject_name : "Chọn lớp"}
+          >
             {loading ? (
               <DropdownItem>Đang tải...</DropdownItem>
             ) : (
               classes.map((cls) => (
                 <DropdownItem
                   key={cls.id}
-                  onClick={() => setSelectedClass(cls.subject_name)}
+                  onClick={() => setSelectedClass(cls)}
                 >
                   {cls.subject_name}
                 </DropdownItem>
@@ -267,25 +196,13 @@ const Attendance = () => {
             )}
           </Dropdown>
 
-          {/* Nút tìm kiếm */}
+          {/* Search */}
           <div className="w-full md:w-auto">
-            <label htmlFor="search">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm sinh viên"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="w-full rounded-xl border-2 border-[#e7e7e7] bg-white px-4 py-2 pr-12 placeholder:text-neutral-400 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="absolute top-1/2 right-2 -translate-y-1/2 transform text-gray-600 hover:text-gray-800"
-                >
-                  <AiOutlineSearch className="h-6 w-6" />
-                </button>
-              </div>
-            </label>
+            <SearchComponent
+              title="Tìm kiếm sinh viên"
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
           </div>
         </div>
 
@@ -310,9 +227,9 @@ const Attendance = () => {
               <th className="px-6 py-3">Mã số sinh viên</th>
               <th className="px-6 py-3">Họ và tên</th>
               <th className="px-6 py-3 text-center">Có mặt</th>
-              <th className="px-6 py-3 text-center">Vắng</th>
-              <th className="px-6 py-3 text-center">Muộn</th>
-              <th className="px-6 py-3">Thời gian</th>
+              <th className="px-6 py-3 text-center">Nghỉ có phép</th>
+              <th className="px-6 py-3 text-center">Nghỉ không phép</th>
+              <th className="px-6 py-3">Muộn</th>
             </tr>
           </thead>
           <tbody>
@@ -322,32 +239,41 @@ const Attendance = () => {
                 className="border-b border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-600"
               >
                 <td className="px-6 py-4">{index + 1}</td>
-                <td className="px-6 py-4">{user.studentId}</td>
+                <td className="px-6 py-4">{user.mssv}</td>
                 <td className="px-6 py-4">{user.name}</td>
                 <td className="px-6 py-4 text-center">
                   <Checkbox
                     color="green"
-                    checked={user.status === "present"}
+                    checked={user.attendance_status === "present"}
                     onChange={() => handleStatusChange(user.id, "present")}
                   />
                 </td>
                 <td className="px-6 py-4 text-center">
                   <Checkbox
-                    color="red"
-                    checked={user.status === "absent"}
+                    color="blue"
+                    checked={user.attendance_status === "absent"}
                     onChange={() => handleStatusChange(user.id, "absent")}
                   />
                 </td>
                 <td className="px-6 py-4 text-center">
                   <Checkbox
+                    color="red"
+                    checked={user.attendance_status === "excused_absence"}
+                    onChange={() =>
+                      handleStatusChange(user.id, "excused_absence")
+                    }
+                  />
+                </td>
+                <td className="px-6 py-4 text-center">
+                  <Checkbox
                     color="yellow"
-                    checked={user.status === "late"}
+                    checked={user.attendance_status === "late"}
                     onChange={() => handleStatusChange(user.id, "late")}
                   />
                 </td>
-                <td className="px-6 py-4">
-                  {new Date(user.time).toLocaleTimeString()}
-                </td>
+                {/* <td className="px-6 py-4">
+                  {new Date(user.email).toLocaleTimeString()}
+                </td> */}
               </tr>
             ))}
           </tbody>
@@ -358,6 +284,7 @@ const Attendance = () => {
               </td>
               <td className="px-6 py-4">{totalPresent}</td>
               <td className="px-6 py-4">{totalAbsent}</td>
+              <td className="px-6 py-4">{totalExcusedAbsence}</td>
               <td className="px-6 py-4">{totalLate}</td>
               <td></td>
             </tr>
@@ -381,4 +308,4 @@ const Attendance = () => {
   );
 };
 
-export default Attendance;
+export default AttendanceTeacher;

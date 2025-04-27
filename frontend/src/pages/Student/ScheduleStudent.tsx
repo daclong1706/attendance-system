@@ -6,7 +6,7 @@ import {
   findCurrentWeek,
   getDefaultSemester,
 } from "../../helper/scheduleHelper";
-import ScheduleTable from "../../components/ui/table/ScheduleTable";
+import ScheduleTable from "../../components/ui/table/scheduleTable";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import LoadingModal from "../../components/modal/LoadingModal";
 import { fetchScheduleByStudent } from "../../store/slices/studentReducer";

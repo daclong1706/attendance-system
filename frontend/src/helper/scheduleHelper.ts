@@ -112,3 +112,21 @@ export const getDefaultSemester = () => {
       ? "Học kỳ 2"
       : "Học kỳ Hè";
 };
+
+export const getMatchingDates = (
+  startDate: string,
+  endDate: string,
+  dayOfWeek: number,
+): string[] => {
+  const resultDates: string[] = [];
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= new Date(endDate)) {
+    if (currentDate.getDay() === dayOfWeek) {
+      resultDates.push(currentDate.toISOString().split("T")[0]);
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return resultDates;
+};

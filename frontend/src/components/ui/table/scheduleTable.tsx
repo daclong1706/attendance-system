@@ -10,7 +10,7 @@ interface ScheduleTableProps {
   selectedWeek: string;
 }
 
-const daysOfWeek = [2, 3, 4, 5, 6, 7, 1];
+const daysOfWeek = [1, 2, 3, 4, 5, 6, 0];
 
 const ScheduleTable: React.FC<ScheduleTableProps> = ({
   scheduleData,
@@ -53,11 +53,11 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
             <th className="px-4 py-2">Phòng</th>
             {daysOfWeek.map((day, index) => (
               <th key={index} className="px-4 py-2">
-                {day === 1 ? "Chủ Nhật" : `Thứ ${day}`} <br />
+                {day === 0 ? "Chủ Nhật" : `Thứ ${day + 1}`} <br />
                 {formatDate(
                   new Date(
                     startOfWeek.getTime() +
-                      (day === 1 ? 6 : day - 2) * 24 * 60 * 60 * 1000,
+                      (day === 0 ? 6 : day - 1) * 24 * 60 * 60 * 1000,
                   ),
                 )}
               </th>

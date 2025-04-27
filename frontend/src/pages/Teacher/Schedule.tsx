@@ -6,10 +6,10 @@ import {
   findCurrentWeek,
   getDefaultSemester,
 } from "../../helper/scheduleHelper";
-import ScheduleTable from "../../components/ui/table/ScheduleTable";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { fetchScheduleByTeacher } from "../../store/slices/teacherReducer";
 import LoadingModal from "../../components/modal/LoadingModal";
+import ScheduleTable from "../../components/ui/table/scheduleTable";
 
 const Schedule = () => {
   // Xác định năm hiện tại và danh sách năm học

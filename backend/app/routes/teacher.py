@@ -49,7 +49,10 @@ def get_teacher_classes():
         ClassSection.id,
         Subject.name.label("subject_name"),
         Subject.code.label("subject_code"),
-        db.func.count(Enrollment.id).label("student_count")
+        db.func.count(Enrollment.id).label("student_count"),
+        ClassSection.day_of_week.label("day_of_week"),
+        ClassSection.start_date.label("start_date"),
+        ClassSection.end_date.label("end_date")
     ).join(Subject, ClassSection.subject_id == Subject.id
     ).outerjoin(Enrollment, Enrollment.class_section_id == ClassSection.id
     ).filter(ClassSection.teacher_id == teacher_id
@@ -62,7 +65,10 @@ def get_teacher_classes():
                 "id": cs.id,
                 "subject_name": cs.subject_name,
                 "subject_code": cs.subject_code,
-                "student_count": cs.student_count
+                "student_count": cs.student_count,
+                "day_of_week": cs.day_of_week,
+                "start_date": cs.start_date,
+                "end_date": cs.end_date
             }
             for cs in class_sections
         ]
@@ -190,6 +196,8 @@ def get_class_attendance():
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     data = request.get_json()
+    print("Dữ liệu nhận được:", data)
+
     class_section_id = data.get("class_section_id")
     selected_date = data.get("selected_date")
     day_of_week = data.get("day_of_week")
