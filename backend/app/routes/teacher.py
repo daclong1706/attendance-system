@@ -169,7 +169,9 @@ def get_teacher_schedule():
             "semester": class_section.semester,
             "year": class_section.year,
             "start_time": class_section.start_time.strftime('%H:%M'),
-            "end_time": class_section.end_time.strftime('%H:%M')
+            "end_time": class_section.end_time.strftime('%H:%M'),
+            "start_date": class_section.start_date.strftime('%Y-%m-%d'),
+            "end_date": class_section.end_date.strftime('%Y-%m-%d')
         })
 
     return jsonify({"data": teaching_schedule}), 200

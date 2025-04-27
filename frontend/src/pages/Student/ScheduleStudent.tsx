@@ -3,29 +3,56 @@ import DropdownComponent from "../../components/ui/DropdownComponent";
 import {
   generateAcademicYears,
   getSemesterDates,
+  findCurrentWeek,
+  getDefaultSemester,
 } from "../../helper/scheduleHelper";
-import scheduleData from "../../assets/data/schedule";
-import ScheduleTable from "../../components/ui/table/scheduleTable";
+import ScheduleTable from "../../components/ui/table/ScheduleTable";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import LoadingModal from "../../components/modal/LoadingModal";
+import { fetchScheduleByStudent } from "../../store/slices/studentReducer";
 
 const ScheduleStudent = () => {
-  const academicYears = generateAcademicYears(2022, 2030);
+  const currentYear = new Date().getFullYear();
+  const academicYears = generateAcademicYears(currentYear - 5, currentYear + 5);
+  const defaultYear =
+    academicYears.find((year) => year.includes(currentYear.toString())) ||
+    academicYears[0];
+
+  // Xác định học kỳ hiện tại
+  const defaultSemester = getDefaultSemester();
+
+  // Danh sách học kỳ
   const semesters = ["Học kỳ 1", "Học kỳ 2", "Học kỳ Hè"];
 
-  const [selectedYear, setSelectedYear] = useState(academicYears[0]);
-  const [selectedSemester, setSelectedSemester] = useState(semesters[0]);
-  const [weeks, setWeeks] = useState<string[]>(
+  // Khởi tạo state
+  const [selectedYear, setSelectedYear] = useState(defaultYear);
+  const [selectedSemester, setSelectedSemester] = useState(defaultSemester);
+  const [weeks, setWeeks] = useState(
     getSemesterDates(selectedYear, selectedSemester),
   );
-  const [selectedWeek, setSelectedWeek] = useState(weeks[0]);
+  const [selectedWeek, setSelectedWeek] = useState(findCurrentWeek(weeks));
 
+  // Cập nhật tuần khi thay đổi năm học hoặc học kỳ
   useEffect(() => {
     const updatedWeeks = getSemesterDates(selectedYear, selectedSemester);
     setWeeks(updatedWeeks);
-    setSelectedWeek(updatedWeeks[0]);
+    setSelectedWeek(findCurrentWeek(updatedWeeks));
   }, [selectedYear, selectedSemester]);
 
+  // Fetch dữ liệu từ Redux store
+  const dispatch = useAppDispatch();
+  const { schedule, loading, error } = useAppSelector((state) => state.student);
+
+  useEffect(() => {
+    dispatch(fetchScheduleByStudent());
+  }, [dispatch]);
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
   return (
-    <div className="flex flex-col">
+    <div className="mt-4 flex flex-col">
       <div className="flex space-x-3">
         <DropdownComponent
           label="Năm học"
@@ -46,7 +73,8 @@ const ScheduleStudent = () => {
           onSelect={setSelectedWeek}
         />
       </div>
-      <ScheduleTable scheduleData={scheduleData} selectedWeek={selectedWeek} />
+      <ScheduleTable scheduleData={schedule} selectedWeek={selectedWeek} />
+      <LoadingModal isOpen={loading} />
     </div>
   );
 };
