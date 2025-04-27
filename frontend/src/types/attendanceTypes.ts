@@ -32,3 +32,22 @@ export interface AttendanceRequest {
   id: number;
   status: string;
 }
+
+export interface AttendanceStatus {
+  student_id: number;
+  class_section_id: number;
+  attendance_history: {
+    date: string;
+    attendance_status: string;
+  }[];
+}
+
+export interface AttendanceRecord {
+  date: string;
+  attendance_status: string;
+}
+
+export interface AttendanceHistory {
+  student_id: number;
+  attendance_history: Record<number, AttendanceRecord[]>;
+}

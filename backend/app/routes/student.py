@@ -93,6 +93,7 @@ def get_student_attendance_history():
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     data = request.get_json()
+    print("Dữ liệu nhận được:", data)
     student_id = data.get("student_id")
     class_section_id = data.get("class_section_id")
 
@@ -118,6 +119,43 @@ def get_student_attendance_history():
         "data": {
             "student_id": student_id,
             "class_section_id": class_section_id,
+            "attendance_history": attendance_history
+        }
+    }), 200
+    
+@student_bp.route("/attendance/all", methods=["POST"])
+@jwt_required_middleware
+def get_student_full_attendance_history():
+    if g.user_role != "student":
+        return jsonify({"message": "Forbidden: Students only"}), 403
+
+    data = request.get_json()
+    print("Dữ liệu nhận được:", data)
+    student_id = data.get("student_id")
+
+    if not student_id:
+        return jsonify({"message": "Missing required parameter: student_id"}), 400
+
+    attendance_records = Attendance.query.filter_by(student_id=student_id).join(AttendanceSession).all()
+
+    if not attendance_records:
+        return jsonify({"message": "Attendance records not found"}), 404
+
+    attendance_history = {}
+
+    for record in attendance_records:
+        class_section_id = record.attendance_session.class_session_id
+        if class_section_id not in attendance_history:
+            attendance_history[class_section_id] = []
+
+        attendance_history[class_section_id].append({
+            "date": record.attendance_session.date.strftime("%Y-%m-%d"),
+            "attendance_status": record.status
+        })
+
+    return jsonify({
+        "data": {
+            "student_id": student_id,
             "attendance_history": attendance_history
         }
     }), 200
