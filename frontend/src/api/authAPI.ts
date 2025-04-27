@@ -15,6 +15,23 @@ class AuthAPI {
       throw error;
     }
   }
+  async fetchRoleCounts(): Promise<{
+    admin: number;
+    teacher: number;
+    student: number;
+  } | null> {
+    try {
+      const response = await axiosClient.get<{
+        admin: number;
+        teacher: number;
+        student: number;
+      }>("/auth/role-count");
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng role:", error);
+      return null;
+    }
+  }
 
   async logout(): Promise<void> {
     localStorage.removeItem("auth");

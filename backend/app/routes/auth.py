@@ -15,6 +15,8 @@ def login():
 
     # access_token = create_access_token(identity=user.id)
     access_token = create_access_token(identity=str(user.id))  # Use string for the identity
+    
+    
 
     return jsonify({
         "data": {
@@ -27,6 +29,21 @@ def login():
             }
         }
     }), 200
+    
+@auth_bp.route("/role-count", methods=["GET"])
+def count_roles():
+    from sqlalchemy import func
+
+    role_counts = (
+        db.session.query(User.role, func.count(User.id))
+        .group_by(User.role)
+        .all()
+    )
+
+    role_summary = {role: count for role, count in role_counts}
+
+    return jsonify({"data": role_summary}), 200
+
 
 # @auth_bp.route("/register", methods=["POST"])
 # def register():

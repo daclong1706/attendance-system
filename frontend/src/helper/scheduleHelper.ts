@@ -21,6 +21,11 @@ export const formatDate = (date: Date) => {
   return `${day}/${month}/${year}`;
 };
 
+export const formatDateString = (dateString: string): string => {
+  const date = new Date(dateString); // Chuyển chuỗi ngày về kiểu Date
+  return date.toISOString().split("T")[0]; // Lấy định dạng `YYYY-MM-DD`
+};
+
 export const generateWeeks = (startDate: Date, endDate: Date) => {
   const weeks = [];
   const current = new Date(startDate);

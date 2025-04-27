@@ -251,6 +251,9 @@ def get_class_attendance():
         }
         for attendance in attendances
     ]
+    
+    if len(students) == 0: 
+        return jsonify({"message": "Không có dữ liệu điểm danh cho lớp này"}), 404
 
     return jsonify(
         {
