@@ -2,6 +2,7 @@ import {
   MdAssessment,
   MdCalendarMonth,
   MdGroup,
+  MdLibraryBooks,
   MdNotifications,
   MdOutlineNoteAlt,
   MdPerson,
@@ -27,4 +28,5 @@ export const icons = {
   attendance: getIcon(MdOutlineNoteAlt),
   notification: getIcon(MdNotifications),
   qrcode: getIcon(MdQrCode2),
+  subject: getIcon(MdLibraryBooks),
 };

@@ -1,41 +1,47 @@
 import { useState } from "react";
 
-interface DataItem {
-  [key: string]: any;
-}
-
-interface Props {
-  data: DataItem[];
+interface Props<T> {
+  data: T[];
   itemsPerPage: number;
 }
 
-export const useTable = ({ data, itemsPerPage }: Props) => {
-  const [sortColumn, setSortColumn] = useState<string>("");
+export const useTable = <T extends Record<string, any>>({
+  data,
+  itemsPerPage,
+}: Props<T>) => {
+  const [sortColumn, setSortColumn] = useState<keyof T | "">("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc" | "">("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  // Lọc danh sách theo từ khóa tìm kiếm
-  const filteredData = data.filter((item) =>
-    item.name?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredData = Array.isArray(data)
+    ? data.filter(
+        (item) =>
+          item &&
+          typeof item === "object" &&
+          Object.values(item).some(
+            (value) =>
+              typeof value === "string" &&
+              value.toLowerCase().includes(searchTerm.toLowerCase()),
+          ),
+      )
+    : [];
 
   // Sắp xếp danh sách
-  const sortedData = sortDirection
-    ? [...filteredData].sort((a, b) => {
-        const valueA = a[sortColumn]?.toLowerCase?.() || a[sortColumn];
-        const valueB = b[sortColumn]?.toLowerCase?.() || b[sortColumn];
+  const sortedData =
+    sortColumn && sortDirection
+      ? [...filteredData].sort((a, b) => {
+          const valueA = a[sortColumn];
+          const valueB = b[sortColumn];
 
-        if (valueA && valueB) {
-          if (sortDirection === "asc") {
-            return valueA > valueB ? 1 : -1;
-          } else {
-            return valueA < valueB ? 1 : -1;
+          if (typeof valueA === "string" && typeof valueB === "string") {
+            return sortDirection === "asc"
+              ? valueA.localeCompare(valueB)
+              : valueB.localeCompare(valueA);
           }
-        }
-        return 0;
-      })
-    : filteredData;
+          return 0;
+        })
+      : filteredData;
 
   // Phân trang
   const paginatedData = sortedData.slice(
@@ -46,7 +52,7 @@ export const useTable = ({ data, itemsPerPage }: Props) => {
   const totalItems = sortedData.length;
 
   // Hàm sắp xếp
-  const handleSort = (column: string) => {
+  const handleSort = (column: keyof T) => {
     if (sortColumn === column) {
       setSortDirection(
         sortDirection === "asc"

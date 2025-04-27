@@ -13,6 +13,8 @@ class ClassSection(db.Model):
     day_of_week = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
     semester = db.Column(db.String(20), nullable=False)
     year = db.Column(db.Integer, nullable=False)
     subject = db.relationship("Subject", backref="class_sections")

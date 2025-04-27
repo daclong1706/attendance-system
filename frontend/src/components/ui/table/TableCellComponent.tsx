@@ -13,6 +13,7 @@ const TableCellComponent: React.FC<TableCellProps> = ({
 }) => {
   return (
     <td
+      scope="row"
       className={`border-y-2 border-neutral-200 px-6 py-4 ${className}`} // bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-600
       title={title}
     >

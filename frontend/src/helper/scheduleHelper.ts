@@ -1,4 +1,3 @@
-// helpers.ts
 export const generateAcademicYears = (startYear: number, endYear: number) => {
   const years = [];
   for (let year = startYear; year < endYear; year++) {
@@ -61,4 +60,73 @@ export const getSemesterDates = (academicYear: string, semester: string) => {
   }
 
   return generateWeeks(startDate, endDate);
+};
+
+export const findCurrentWeek = (weeks: string[]) => {
+  const currentDate = new Date();
+
+  if (weeks.length === 0) return "";
+
+  for (const week of weeks) {
+    const [start, end] = week.split(" - ").map((date) => {
+      const parsedDate = new Date(date.split("/").reverse().join("-"));
+      return new Date(
+        parsedDate.getFullYear(),
+        parsedDate.getMonth(),
+        parsedDate.getDate(),
+      );
+    });
+
+    const normalizedStart = new Date(
+      start.getFullYear(),
+      start.getMonth(),
+      start.getDate(),
+    );
+    const normalizedEnd = new Date(
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate(),
+    );
+    const normalizedCurrent = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+    );
+
+    if (
+      normalizedCurrent >= normalizedStart &&
+      normalizedCurrent <= normalizedEnd
+    ) {
+      return week;
+    }
+  }
+
+  return weeks[0];
+};
+
+export const getDefaultSemester = () => {
+  const currentMonth = new Date().getMonth() + 1;
+  return currentMonth >= 8
+    ? "Học kỳ 1"
+    : currentMonth >= 1 && currentMonth <= 5
+      ? "Học kỳ 2"
+      : "Học kỳ Hè";
+};
+
+export const getMatchingDates = (
+  startDate: string,
+  endDate: string,
+  dayOfWeek: number,
+): string[] => {
+  const resultDates: string[] = [];
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= new Date(endDate)) {
+    if (currentDate.getDay() === dayOfWeek) {
+      resultDates.push(currentDate.toISOString().split("T")[0]);
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return resultDates;
 };

@@ -1,118 +1,44 @@
-import { useState } from "react";
-import { AiOutlineSearch } from "react-icons/ai";
-import { FaPlusSquare } from "react-icons/fa";
+import { Button } from "flowbite-react";
+import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
 import { useTable } from "../../components/hook/useTable";
-import SortIcon from "../../components/ui/SortIcon";
+import DeleteModal from "../../components/modal/DeleteModal";
+import LoadingModal from "../../components/modal/LoadingModal";
 import PaginationComponent from "../../components/ui/PanigationComponent";
+import SearchComponent from "../../components/ui/SearchComponent";
+import TableBodyComponent from "../../components/ui/table/TableBodyComponent";
+import TableCellComponent from "../../components/ui/table/TableCellComponent";
 import TableComponent from "../../components/ui/table/TableComponent";
 import TableHeadCellComponent from "../../components/ui/table/TableHeadCellComponent";
 import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
 import TableRowComponent from "../../components/ui/table/TableRowComponent";
-
-const data = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    role: "admin",
-    status: "active",
-    created_at: "2024-04-01",
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    email: "tranthib@example.com",
-    role: "teacher",
-    status: "active",
-    created_at: "2024-03-28",
-  },
-  {
-    id: 3,
-    name: "Lê Hoàng C",
-    email: "lehoangc@example.com",
-    role: "teacher",
-    status: "inactive",
-    created_at: "2024-03-15",
-  },
-  {
-    id: 4,
-    name: "Phạm Minh D",
-    email: "phamminhd@example.com",
-    role: "student",
-    status: "active",
-    created_at: "2024-03-10",
-  },
-  {
-    id: 5,
-    name: "Bùi Thanh E",
-    email: "buithanhe@example.com",
-    role: "student",
-    status: "inactive",
-    created_at: "2024-02-20",
-  },
-  {
-    id: 6,
-    name: "Đặng Quang F",
-    email: "dangquangf@example.com",
-    role: "admin",
-    status: "active",
-    created_at: "2024-02-01",
-  },
-  {
-    id: 7,
-    name: "Hoàng Anh G",
-    email: "hoanganhg@example.com",
-    role: "teacher",
-    status: "active",
-    created_at: "2024-01-15",
-  },
-  {
-    id: 8,
-    name: "Ngô Thị H",
-    email: "ngothih@example.com",
-    role: "student",
-    status: "active",
-    created_at: "2024-01-10",
-  },
-  {
-    id: 9,
-    name: "Vũ Văn I",
-    email: "vuvani@example.com",
-    role: "student",
-    status: "inactive",
-    created_at: "2023-12-25",
-  },
-  {
-    id: 10,
-    name: "Đỗ Khánh J",
-    email: "dokhanhj@example.com",
-    role: "teacher",
-    status: "active",
-    created_at: "2023-12-05",
-  },
-  {
-    id: 11,
-    name: "Phan Tuấn K",
-    email: "phantuan@example.com",
-    role: "student",
-    status: "active",
-    created_at: "2023-11-20",
-  },
-  {
-    id: 12,
-    name: "Lâm Thanh L",
-    email: "lamthanhl@example.com",
-    role: "admin",
-    status: "active",
-    created_at: "2023-10-30",
-  },
-];
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { fetchAllUsers } from "../../store/slices/userReducer";
+import { User } from "../../types/userTypes";
+import CreateUserForm from "./CreateUserForm";
+import EditUserForm from "./EditUserForm";
+import ViewUserForm from "./ViewUserForm";
+import ActionComponent from "../../components/ui/ActionComponent";
+import { FaPlusSquare } from "react-icons/fa";
 
 const Home = () => {
   const itemsPerPage = 10;
+  // const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { users, loading } = useAppSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
   const {
-    paginatedData: users,
+    paginatedData: data,
     totalItems,
     currentPage,
     setCurrentPage,
@@ -121,39 +47,24 @@ const Home = () => {
     handleSort,
     sortColumn,
     sortDirection,
-  } = useTable({ data: data || [], itemsPerPage });
+  } = useTable({ data: users || [], itemsPerPage });
 
   return (
-    <div className="mx-auto hidden max-w-6xl p-4 md:block">
+    <div className="mx-auto mt-4 max-w-6xl p-4 md:block">
       <div className="overflow-x-auto sm:rounded-lg">
-        <div className="mb-6 flex flex-row justify-between">
-          <label htmlFor="search">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Tìm kiếm người dùng"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-xl border-2 border-[#e7e7e7] bg-white px-4 py-2 pr-12 placeholder:text-neutral-400 focus:border-indigo-500 focus:outline-none"
-              />
+        <div className="mt-2 mb-6 flex flex-row justify-between">
+          <SearchComponent
+            title="Tìm kiếm người dùng"
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
 
-              {/* Search Icon */}
-              <button
-                type="submit"
-                className="absolute top-1/2 right-2 -translate-y-1/2 transform text-gray-600 hover:text-gray-800"
-              >
-                <AiOutlineSearch className="h-6 w-6" />
-              </button>
-            </div>
-          </label>
-          {/* <Link to="add-book" className="font-medium uppercase"> */}
-          <div>
-            <button className="bg-create-100 hover:bg-create-200 flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-white">
-              <FaPlusSquare className="h-5 w-5" />
-              Sách
-            </button>
+          <div className="mr-2">
+            <Button color="green" onClick={() => setIsCreateOpen(true)}>
+              <FaPlusSquare className="mr-2 h-5 w-5" />
+              Tài khoản
+            </Button>
           </div>
-          {/* </Link> */}
         </div>
 
         <TableComponent>
@@ -172,9 +83,9 @@ const Home = () => {
                 sortDirection={sortDirection}
               />
               <TableHeadCellComponent
-                columnName="email"
-                label="Email"
-                onSort={() => handleSort("email")}
+                columnName="mssv"
+                label="Mã số"
+                onSort={() => handleSort("mssv")}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
               />
@@ -191,29 +102,20 @@ const Home = () => {
               />
             </TableRowComponent>
           </TableHeadComponent>
-          <tbody>
-            {users.length > 0 ? (
-              users.map((user) => (
-                <tr
+          <TableBodyComponent>
+            {data.length > 0 ? (
+              data.map((user) => (
+                <TableRowComponent
                   key={user.id}
                   className="bg-gray-50 hover:bg-indigo-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
                 >
-                  <td
-                    className="w-4 rounded-l-xl border-y-2 border-l-2 border-neutral-200 p-4"
-                    style={{
-                      maxWidth: "150px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                    title={user.id}
+                  <TableCellComponent
+                    className="rounded-l-xl border-l-2"
+                    title={user.id.toString()}
                   >
                     {user.id}
-                  </td>
-                  <td
-                    scope="row"
-                    className="flex items-center border-y-2 border-neutral-200 px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white"
-                  >
+                  </TableCellComponent>
+                  <TableCellComponent className="flex items-center">
                     {user?.avatar ? (
                       <img
                         className="h-10 w-10 rounded-full"
@@ -237,28 +139,21 @@ const Home = () => {
                         {user.email}
                       </div>
                     </div>
-                  </td>
+                  </TableCellComponent>
 
-                  <td className="border-y-2 border-neutral-200 px-6 py-4">
-                    {user.email}
-                  </td>
+                  <TableCellComponent>{user.mssv}</TableCellComponent>
+                  <TableCellComponent>{user.role}</TableCellComponent>
 
-                  <td className="border-y-2 border-neutral-200 px-6 py-4">
-                    <div
-                      className="font-normal text-gray-500"
-                      title={user.role}
-                    >
-                      {user.role}
-                    </div>
-                  </td>
-
-                  <td className="rounded-r-xl border-y-2 border-r-2 border-neutral-200 px-6 py-4">
-                    <div className="flex flex-row items-center justify-center gap-3">
-                      <button className="cursor-pointer text-neutral-400 hover:text-blue-400"></button>
-                      <button className="cursor-pointer text-neutral-400 hover:text-green-400"></button>
-                    </div>
-                  </td>
-                </tr>
+                  <TableCellComponent className="rounded-r-xl border-r-2">
+                    <ActionComponent<User>
+                      data={user}
+                      setSelectedData={setSelectedUser}
+                      setIsViewOpen={setIsViewOpen}
+                      setIsEditOpen={setIsEditOpen}
+                      setIsDeleteOpen={setIsDeleteOpen}
+                    />
+                  </TableCellComponent>
+                </TableRowComponent>
               ))
             ) : (
               <tr>
@@ -270,7 +165,7 @@ const Home = () => {
                 </td>
               </tr>
             )}
-          </tbody>
+          </TableBodyComponent>
         </TableComponent>
 
         <PaginationComponent
@@ -280,6 +175,34 @@ const Home = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
+      <LoadingModal isOpen={loading} />
+      <CreateUserForm
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
+      {selectedUser && (
+        <DeleteModal
+          userName={selectedUser.name}
+          userID={selectedUser.id}
+          openModal={isDeleteOpen}
+          setOpenModal={setIsDeleteOpen}
+        />
+      )}
+      {selectedUser && (
+        <EditUserForm
+          user={selectedUser}
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
+      \
+      {selectedUser && (
+        <ViewUserForm
+          user={selectedUser}
+          openModal={isViewOpen}
+          setOpenModal={setIsViewOpen}
+        />
+      )}
     </div>
   );
 };

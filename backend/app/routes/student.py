@@ -64,18 +64,23 @@ def get_student_schedule():
     for enrollment in enrollments:
         class_section = ClassSection.query.filter_by(id=enrollment.class_section_id).first()
         subject = Subject.query.filter_by(id=class_section.subject_id).first()
+        teacher = User.query.filter_by(id=class_section.teacher_id).first();
 
         class_time = f"{class_section.start_time.strftime('%H:%M')} - {class_section.end_time.strftime('%H:%M')}"
 
         student_schedule.append({
             "subject": subject.name,
             "class_time": class_time,
-            "class_name": class_section.room,
+            "room": class_section.room,
             "day_of_week": class_section.day_of_week,
             "semester": class_section.semester,
             "year": class_section.year,
             "start_time": class_section.start_time.strftime('%H:%M'),
-            "end_time": class_section.end_time.strftime('%H:%M')
+            "end_time": class_section.end_time.strftime('%H:%M'),
+            "start_date": class_section.start_date.strftime('%Y-%m-%d'),
+            "end_date": class_section.end_date.strftime('%Y-%m-%d'),
+            "teacher_name": teacher.name,
+            "teacher_email": teacher.email
         })
 
     return jsonify({"data": student_schedule}), 200

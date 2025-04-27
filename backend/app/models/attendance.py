@@ -20,7 +20,7 @@ class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     attendance_session_id = db.Column(db.Integer, db.ForeignKey('attendance_sessions.id'), nullable=False)
-    status = db.Column(db.Enum('present', 'absent', 'late', 'leave'), default='present')
+    status = db.Column(db.Enum('present', 'absent', 'excused_absence', 'late', 'not_recorded'), default='not_recorded')
     checked_at = db.Column(db.DateTime)
 
     student = db.relationship('User', backref='attendances')
@@ -37,7 +37,7 @@ class AttendanceLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     attendance_session_id = db.Column(db.Integer, db.ForeignKey('attendance_sessions.id'), nullable=False)
-    status = db.Column(db.Enum('present', 'absent', 'late', 'leave'), default='present')
+    status = db.Column(db.Enum('present', 'absent', 'excused_absence', 'late', 'not_recorded'), default='not_recorded')
     checked_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
 
     student = db.relationship('User', backref='attendance_logs')

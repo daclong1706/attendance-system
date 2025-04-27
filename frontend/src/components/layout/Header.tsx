@@ -19,7 +19,7 @@ const Header = ({ toggleSidebar }: Props) => {
   const user = useAppSelector((state) => state.auth.user);
   return (
     <>
-      <Navbar fluid rounded>
+      <Navbar fluid rounded className="rounded-2xl shadow">
         <NavbarBrand>
           <NavbarToggle onClick={toggleSidebar} />
         </NavbarBrand>
