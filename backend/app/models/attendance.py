@@ -9,7 +9,6 @@ class AttendanceSession(db.Model):
     qr_code_end = db.Column(db.String(255), nullable=False)
 
     class_session = db.relationship('ClassSection', backref='attendance_sessions')
-
     __table_args__ = (db.UniqueConstraint('class_session_id', 'date', name='_class_session_date_uc'),)
 
     def __repr__(self):
