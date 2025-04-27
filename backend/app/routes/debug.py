@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, g
 from app.models.user import User
+from app.models.attendance import Attendance, AttendanceLog, AttendanceSession
 from app.extensions import db
 from app.middlewares.auth_middleware import jwt_required_middleware
 from werkzeug.security import generate_password_hash
@@ -43,3 +44,36 @@ def protected_student():
     # Access the authenticated user's ID from flask.g
     user_id = g.get("user_id")
     return jsonify({"message": f"Welcome, user {user_id}!"}), 200
+
+@debug_bp.route("/attendance/<int:attendance_session_id>", methods=["GET"])
+def get_attendances_for_session(attendance_session_id):
+    # Log attendance session ID
+    print(f"Fetching attendances for session ID: {attendance_session_id}")
+
+    # Query the attendances
+    attendances = Attendance.query.filter_by(attendance_session_id=attendance_session_id).all()
+
+    # Check if any attendances exist for the session
+    if not attendances:
+        print("No attendances found for this session.")
+        return jsonify({"message": "No attendances found for this session"}), 404
+
+    # Prepare list of attendance data
+    attendance_list = []
+    for attendance in attendances:
+        student = User.query.get(attendance.student_id)
+        attendance_list.append({
+            "attendance_id": attendance.id,
+            "student_id": attendance.student_id,
+            "student_name": student.name if student else "Unknown",
+            "status": attendance.status,
+            #"timestamp": attendance.timestamp.strftime('%Y-%m-%d %H:%M:%S') if attendance.timestamp else None
+        })
+
+    # Log the attendance list
+    print(f"Found {len(attendance_list)} attendance records.")
+
+    # Return the data
+    return jsonify({
+        "data": attendance_list
+    }), 200
