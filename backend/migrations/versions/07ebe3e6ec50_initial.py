@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: 829f9aa20ed4
+Revision ID: 07ebe3e6ec50
 Revises: 
-Create Date: 2025-04-27 10:15:29.202303
+Create Date: 2025-04-27 13:51:54.200305
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '829f9aa20ed4'
+revision = '07ebe3e6ec50'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -75,7 +75,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
     sa.Column('attendance_session_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('present', 'absent', 'late', 'leave'), nullable=True),
+    sa.Column('status', sa.Enum('present', 'absent', 'excused_absence', 'late', 'not_recorded'), nullable=True),
     sa.Column('checked_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
     sa.ForeignKeyConstraint(['attendance_session_id'], ['attendance_sessions.id'], ),
     sa.ForeignKeyConstraint(['student_id'], ['users.id'], ),
@@ -85,7 +85,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
     sa.Column('attendance_session_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('present', 'absent', 'late', 'leave'), nullable=True),
+    sa.Column('status', sa.Enum('present', 'absent', 'excused_absence', 'late', 'not_recorded'), nullable=True),
     sa.Column('checked_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['attendance_session_id'], ['attendance_sessions.id'], ),
     sa.ForeignKeyConstraint(['student_id'], ['users.id'], ),

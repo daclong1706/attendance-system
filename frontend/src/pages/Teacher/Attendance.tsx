@@ -6,7 +6,7 @@ import {
   Dropdown,
   DropdownItem,
 } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdQrCode2 } from "react-icons/md";
 import { TbFaceId } from "react-icons/tb";
@@ -14,6 +14,9 @@ import * as XLSX from "xlsx";
 import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
 import FaceAttendance from "../Attendance/FaceAttendance";
 import QRAttendance from "../Attendance/QRAttendance";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { fetchAllClassesByTeacher } from "../../store/slices/teacherReducer";
+import LoadingModal from "../../components/modal/LoadingModal";
 
 const fakeUsers = [
   {
@@ -210,7 +213,6 @@ const Attendance = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
 
-    // Xuất file Excel
     const excelBuffer = XLSX.write(workbook, {
       bookType: "xlsx",
       type: "array",
@@ -227,10 +229,20 @@ const Attendance = () => {
     );
   };
 
+  const dispatch = useAppDispatch();
+
+  const { classes, loading } = useAppSelector((state) => state.teacher);
+
+  useEffect(() => {
+    dispatch(fetchAllClassesByTeacher());
+  }, [dispatch]);
+
   const openQRModal = () => setIsQRModalOpen(true);
   const closeQRModal = () => setIsQRModalOpen(false);
   const openFaceModal = () => setIsFaceModalOpen(true);
   const closeFaceModal = () => setIsFaceModalOpen(false);
+
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
 
   return (
     <section className="my-4">
@@ -240,11 +252,21 @@ const Attendance = () => {
           <div>
             <Datepicker />
           </div>
-          <Dropdown label="Lớp">
-            <DropdownItem>Công nghệ phần mềm</DropdownItem>
-            <DropdownItem>Thực hành nghề nghiệp</DropdownItem>
-            <DropdownItem>Lập trình cơ bản</DropdownItem>
+          <Dropdown label={selectedClass || "Chọn lớp"}>
+            {loading ? (
+              <DropdownItem>Đang tải...</DropdownItem>
+            ) : (
+              classes.map((cls) => (
+                <DropdownItem
+                  key={cls.id}
+                  onClick={() => setSelectedClass(cls.subject_name)}
+                >
+                  {cls.subject_name}
+                </DropdownItem>
+              ))
+            )}
           </Dropdown>
+
           {/* Nút tìm kiếm */}
           <div className="w-full md:w-auto">
             <label htmlFor="search">
@@ -354,6 +376,7 @@ const Attendance = () => {
       </div>
       {isQRModalOpen && <QRAttendance onClose={closeQRModal} />}
       {isFaceModalOpen && <FaceAttendance onClose={closeFaceModal} />}
+      <LoadingModal isOpen={loading} />
     </section>
   );
 };
