@@ -96,16 +96,14 @@ def get_class_details(class_section_id):
     
     return jsonify({
         "data": {
-            "class": {
-                "id": class_section.id,
-                "subject_name": subject.name,
-                "subject_code": subject.code,
-                "room": class_section.room,
-                "day_of_week": class_section.day_of_week,
-                "start_time": class_section.start_time.strftime('%H:%M'),
-                "end_time": class_section.end_time.strftime('%H:%M'),
-                "students": students
-            }
+            "id": class_section.id,
+            "subject_name": subject.name,
+            "subject_code": subject.code,
+            "room": class_section.room,
+            "day_of_week": class_section.day_of_week,
+            "start_time": class_section.start_time.strftime('%H:%M'),
+            "end_time": class_section.end_time.strftime('%H:%M'),
+            "students": students
         }
     }), 200
 
@@ -166,7 +164,7 @@ def get_teacher_schedule():
         teaching_schedule.append({
             "subject": subject.name,
             "class_time": class_time,
-            "class_name": class_section.room,
+            "room": class_section.room,
             "day_of_week": class_section.day_of_week,
             "semester": class_section.semester,
             "year": class_section.year,

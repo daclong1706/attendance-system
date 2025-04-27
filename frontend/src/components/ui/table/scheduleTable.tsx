@@ -3,6 +3,7 @@ import { formatDate } from "../../../helper/scheduleHelper";
 import TableComponent from "./TableComponent";
 import TableHeadComponent from "./TableHeadComponent";
 import TableRowComponent from "./TableRowComponent";
+import { Schedule } from "../../../types/scheduleTypes";
 
 interface ScheduleEntry {
   room: string;
@@ -12,7 +13,7 @@ interface ScheduleEntry {
 }
 
 interface ScheduleTableProps {
-  scheduleData: any[];
+  scheduleData: Schedule[];
   selectedWeek: string;
 }
 
@@ -76,16 +77,16 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                 const entry = scheduleData.find(
                   (item) =>
                     item.room === room &&
-                    item.day === day &&
+                    item.day_of_week === day &&
                     isWithinSelectedWeek(
-                      item.startDate,
-                      item.endDate,
+                      item.start_time,
+                      item.end_time,
                       selectedWeek,
                     ),
                 );
                 return (
                   <td key={day} className="px-4 py-2 text-center">
-                    {entry ? `${entry.courseName} (${entry.period})` : ""}
+                    {entry ? `${entry.semester} (${entry.year})` : ""}
                   </td>
                 );
               })}

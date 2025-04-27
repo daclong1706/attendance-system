@@ -6,6 +6,8 @@ import {
 } from "../../helper/scheduleHelper";
 import ScheduleTable from "../../components/ui/table/scheduleTable";
 import scheduleData from "../../assets/data/schedule";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { fetchScheduleByTeacher } from "../../store/slices/teacherReducer";
 
 const Schedule = () => {
   const academicYears = generateAcademicYears(2022, 2030);
@@ -23,6 +25,29 @@ const Schedule = () => {
     setWeeks(updatedWeeks);
     setSelectedWeek(updatedWeeks[0]);
   }, [selectedYear, selectedSemester]);
+
+  const dispatch = useAppDispatch();
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { schedule, loading, error } = useAppSelector((state) => state.teacher);
+
+  useEffect(() => {
+    dispatch(fetchScheduleByTeacher());
+  }, [dispatch]);
+
+  if (loading) {
+    return <p>Loading schedule...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  console.log(schedule);
 
   return (
     <div className="flex flex-col">
@@ -46,7 +71,7 @@ const Schedule = () => {
           onSelect={setSelectedWeek}
         />
       </div>
-      <ScheduleTable scheduleData={scheduleData} selectedWeek={selectedWeek} />
+      <ScheduleTable scheduleData={schedule} selectedWeek={selectedWeek} />
     </div>
   );
 };
