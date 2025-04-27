@@ -312,3 +312,55 @@ def save_attendance():
     db.session.commit()
 
     return jsonify({"message": "Attendance saved successfully"}), 200
+
+@teacher_bp.route('/attendance/qr-code', methods=['POST'])
+def get_or_create_qr_code():
+    data = request.get_json()
+
+    date_str = data.get('date')
+    class_section_id = data.get('class_section_id')
+
+    if not date_str:
+        return jsonify({"message": "Date parameter is required"}), 400
+    if not class_section_id:
+        return jsonify({"message": "Class section ID parameter is required"}), 400
+
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"message": "Invalid date format. Please use YYYY-MM-DD"}), 400
+
+    try:
+        class_section_id = int(class_section_id)
+    except ValueError:
+        return jsonify({"message": "Invalid class section ID"}), 400
+
+    class_section = ClassSection.query.get(class_section_id)
+    if not class_section:
+        return jsonify({"message": "Class section not found"}), 404
+
+    existing_session = AttendanceSession.query.filter_by(
+        date=selected_date, class_session_id=class_section_id).first()
+
+    if existing_session:
+        return jsonify({
+            "qr_code_start": existing_session.qr_code_start,
+            "qr_code_end": existing_session.qr_code_end
+        }), 200
+    else:
+        qr_code_start = "QrCodeStart"
+        qr_code_end = "QrCodeEnd"
+
+        attendance_session = AttendanceSession(
+            class_session_id=class_section_id,
+            date=selected_date,
+            qr_code_start=qr_code_start,
+            qr_code_end=qr_code_end
+        )
+        db.session.add(attendance_session)
+        db.session.commit()
+
+        return jsonify({
+            "qr_code_start": qr_code_start,
+            "qr_code_end": qr_code_end
+        }), 201
