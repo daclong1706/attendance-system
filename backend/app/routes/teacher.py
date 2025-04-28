@@ -1,4 +1,7 @@
+import pandas as pd
+import os
 from flask import Blueprint, request, jsonify, g
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from app.models.class_section import ClassSection
 from app.models.user import User
@@ -413,3 +416,157 @@ def save_attendance():
     db.session.commit()
 
     return jsonify({"message": "Attendance saved successfully"}), 200
+
+@teacher_bp.route('/attendance/qr-code', methods=['POST'])
+def get_or_create_qr_code():
+    data = request.get_json()
+
+    date_str = data.get('date')
+    class_section_id = data.get('class_section_id')
+
+    if not date_str:
+        return jsonify({"message": "Date parameter is required"}), 400
+    if not class_section_id:
+        return jsonify({"message": "Class section ID parameter is required"}), 400
+
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"message": "Invalid date format. Please use YYYY-MM-DD"}), 400
+
+    try:
+        class_section_id = int(class_section_id)
+    except ValueError:
+        return jsonify({"message": "Invalid class section ID"}), 400
+
+    class_section = ClassSection.query.get(class_section_id)
+    if not class_section:
+        return jsonify({"message": "Class section not found"}), 404
+
+    existing_session = AttendanceSession.query.filter_by(
+        date=selected_date, class_session_id=class_section_id).first()
+
+    if existing_session:
+        return jsonify({
+            "qr_code_start": existing_session.qr_code_start,
+            "qr_code_end": existing_session.qr_code_end
+        }), 200
+    else:
+        qr_code_start = "QrCodeStart"
+        qr_code_end = "QrCodeEnd"
+
+        attendance_session = AttendanceSession(
+            class_session_id=class_section_id,
+            date=selected_date,
+            qr_code_start=qr_code_start,
+            qr_code_end=qr_code_end
+        )
+        db.session.add(attendance_session)
+        db.session.commit()
+
+        return jsonify({
+            "qr_code_start": qr_code_start,
+            "qr_code_end": qr_code_end
+        }), 201
+    
+@teacher_bp.route('/enrollment/<int:class_section_id>/add', methods=['POST'])
+@jwt_required_middleware
+def add_students_to_class_section(class_section_id):
+    if g.user_role != "teacher":
+        return jsonify({"message": "Forbidden: Teachers only"}), 403
+    
+    data = request.get_json()
+
+    # Validate input
+    student_ids = data.get('student_ids')
+    if not student_ids or not isinstance(student_ids, list):
+        return jsonify({"message": "Invalid input. 'student_ids' must be a list."}), 400
+
+    # Check if class section exists
+    class_section = ClassSection.query.get(class_section_id)
+    if not class_section:
+        return jsonify({"message": "Class section not found."}), 404
+
+    added_students = []
+    skipped_students = []
+
+    for student_id in student_ids:
+        # Check if student exists
+        student = User.query.get(student_id)
+        if not student:
+            skipped_students.append({"student_id": student_id, "reason": "Student not found"})
+            continue
+        
+        # Check if already enrolled
+        already_enrolled = Enrollment.query.filter_by(
+            student_id=student_id, class_section_id=class_section_id
+        ).first()
+
+        if already_enrolled:
+            skipped_students.append({"student_id": student_id, "reason": "Already enrolled"})
+            continue
+
+
+        enrollment = Enrollment(student_id=student_id, class_section_id=class_section_id)
+        db.session.add(enrollment)
+        added_students.append(student_id)
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Students processed.",
+        "added_students": added_students,
+        "skipped_students": skipped_students
+    }), 200
+
+@teacher_bp.route('/enrollment/<int:class_section_id>/add-xlsx', methods=['POST'])
+@jwt_required_middleware
+def add_students_by_excel(class_section_id):
+    if g.user_role != "teacher":
+        return jsonify({"message": "Forbidden: Teachers only"}), 403
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    try:
+        # Read Excel file without header
+        df = pd.read_excel(file, header=None)
+
+        added_students = []
+        skipped_students = []
+
+        for student_mssv in df[0]:
+            user = User.query.filter_by(mssv=student_mssv).first()
+            if user:
+                existing_enrollment = Enrollment.query.filter_by(
+                    class_section_id=class_section_id,
+                    student_id=user.id
+                ).first()
+
+                if not existing_enrollment:
+                    enrollment = Enrollment(
+                        class_section_id=class_section_id,
+                        student_id=user.id
+                    )
+                    db.session.add(enrollment)
+                    added_students.append(student_mssv)
+                else:
+                    skipped_students.append(student_mssv)
+            else:
+                skipped_students.append(student_mssv)
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Student addition from Excel complete',
+            'added_students': added_students,
+            'skipped_students': skipped_students
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
