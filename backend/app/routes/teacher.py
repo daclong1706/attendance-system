@@ -2,13 +2,15 @@ import pandas as pd
 import os
 from flask import Blueprint, request, jsonify, g
 from werkzeug.utils import secure_filename
+from datetime import datetime
 from app.models.class_section import ClassSection
 from app.models.user import User
 from app.models.subject import Subject
 from app.models.enrollment import Enrollment
+from app.models.attendance import Attendance, AttendanceLog, AttendanceSession
 from app.middlewares.auth_middleware import jwt_required_middleware
 from app.extensions import db, bcrypt
-from datetime import datetime
+from app.utils import generate_random_code
 
 teacher_bp = Blueprint("teacher_bp", __name__)
 
@@ -187,10 +189,104 @@ def get_teacher_schedule():
 
     return jsonify({"data": teaching_schedule}), 200
 
-from datetime import datetime
-from flask import jsonify, request, g
-from app.extensions import db
-from app.models import ClassSection, Subject, Enrollment, AttendanceSession, Attendance
+@teacher_bp.route("/attendance-session", methods=["POST"])
+@jwt_required_middleware
+def create_attendance_session():
+    if g.user_role != "teacher":
+        return jsonify({"message": "Forbidden: Teachers only"}), 403
+
+    data = request.get_json()
+
+    class_section_id = data.get("class_section_id")
+    date_str = data.get("date")
+
+    if not all([class_section_id, date_str]):
+        return jsonify({"message": "Missing class_section_id or date"}), 400
+
+    try:
+        date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"message": "Invalid date format, expected YYYY-MM-DD"}), 400
+
+    class_section = ClassSection.query.get(class_section_id)
+    if not class_section:
+        return jsonify({"message": "Class section not found"}), 404
+
+    if class_section.teacher_id != int(g.user_id):
+        return jsonify({"message": "You are not authorized to create attendance session for this class"}), 403
+
+    existing_session = AttendanceSession.query.filter_by(class_session_id=class_section_id, date=date).first()
+    if existing_session:
+        return jsonify({"message": "Attendance session already exists for this class and date"}), 409
+
+    # Step 1: Create AttendanceSession
+    attendance_session = AttendanceSession(
+        class_session_id=class_section_id,
+        date=date,
+        qr_code_start=generate_random_code(),
+        qr_code_end=generate_random_code()
+    )
+
+    db.session.add(attendance_session)
+    db.session.flush()  # Flush so that attendance_session.id is available
+
+    # Step 2: Create Attendances for each student enrolled
+    enrollments = Enrollment.query.filter_by(class_section_id=class_section_id).all()
+
+    for enrollment in enrollments:
+        attendance = Attendance(
+            student_id=enrollment.student_id,
+            attendance_session_id=attendance_session.id,
+            status='present'
+        )
+        db.session.add(attendance)
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Attendance session created successfully",
+        "attendance_session_id": attendance_session.id
+    }), 201
+
+@teacher_bp.route("/attendance-session/<int:attendance_session_id>/update", methods=["PUT"])
+@jwt_required_middleware
+def update_attendance_status(attendance_session_id):
+    if g.user_role != "teacher":
+        return jsonify({"message": "Forbidden: Teachers only"}), 403
+
+    data = request.get_json()
+    
+    updates = data.get("updates", [])  # Expecting a list of updates
+    if not updates:
+        return jsonify({"message": "No updates provided"}), 400
+
+    attendance_session = AttendanceSession.query.get(attendance_session_id)
+    if not attendance_session:
+        return jsonify({"message": "Attendance session not found"}), 404
+
+    updated_attendances = []
+    for update in updates:
+        attendance_id = update.get("attendance_id")
+        new_status = update.get("status")
+
+        if not attendance_id or not new_status:
+            continue  # Skip invalid entries
+
+        attendance = Attendance.query.filter_by(id=attendance_id, attendance_session_id=attendance_session_id).first()
+        if attendance:
+            attendance.status = new_status
+            updated_attendances.append({
+                "attendance_id": attendance.id,
+                "student_id": attendance.student_id,
+                "status": attendance.status
+            })
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Attendance statuses updated successfully",
+        "data": updated_attendances
+    }), 200
 
 @teacher_bp.route("/attendance", methods=["POST"])
 @jwt_required_middleware
@@ -199,6 +295,7 @@ def get_class_attendance():
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     data = request.get_json()
+    
     print("Dữ liệu nhận được:", data)
 
     class_section_id = data.get("class_section_id")
@@ -254,6 +351,9 @@ def get_class_attendance():
         }
         for attendance in attendances
     ]
+    
+    if len(students) == 0: 
+        return jsonify({"message": "Không có dữ liệu điểm danh cho lớp này"}), 404
 
     return jsonify(
         {
@@ -263,7 +363,7 @@ def get_class_attendance():
             }
         }
     ), 200
-    
+
 @teacher_bp.route("/attendance/save", methods=["POST"])
 @jwt_required_middleware
 def save_attendance():
@@ -271,6 +371,7 @@ def save_attendance():
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     data = request.get_json()
+
     class_section_id = data.get("class_section_id")
     selected_date = data.get("selected_date")
     day_of_week = data.get("day_of_week")

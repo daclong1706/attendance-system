@@ -3,7 +3,7 @@ import { createUser, fetchAllUsers } from "../../store/slices/userReducer";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import LoadingModal from "../../components/modal/LoadingModal";
 import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
-import { FloatingLabel, Select } from "flowbite-react";
+import { Button, FloatingLabel, Select } from "flowbite-react";
 
 interface CreateUserFormProps {
   isOpen: boolean;
@@ -47,6 +47,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ isOpen, onClose }) => {
             label="Họ và tên"
             type="text"
             onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+            required
           />
           <FloatingLabel
             variant="outlined"
@@ -55,6 +56,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ isOpen, onClose }) => {
             onChange={(e) =>
               setUserData({ ...userData, email: e.target.value })
             }
+            required
           />
           <FloatingLabel
             variant="outlined"
@@ -63,6 +65,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ isOpen, onClose }) => {
             onChange={(e) =>
               setUserData({ ...userData, password: e.target.value })
             }
+            required
           />
 
           <div className="grid grid-cols-2 gap-2">
@@ -73,6 +76,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ isOpen, onClose }) => {
               onChange={(e) =>
                 setUserData({ ...userData, mssv: e.target.value })
               }
+              required
             />
             <Select
               id="role"
@@ -88,19 +92,12 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ isOpen, onClose }) => {
             </Select>
           </div>
           <div className="mt-6 flex justify-end gap-2">
-            <button
-              type="button"
-              className="rounded bg-gray-500 px-4 py-2 text-white"
-              onClick={onClose}
-            >
+            <Button type="button" color="red" onClick={onClose}>
               Hủy
-            </button>
-            <button
-              type="submit"
-              className="rounded bg-indigo-500 px-4 py-2 text-white"
-            >
+            </Button>
+            <Button type="submit" color="green">
               Tạo tài khoản
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -1,8 +1,24 @@
-import { Button, Datepicker } from "flowbite-react";
-import React from "react";
+import { Datepicker } from "flowbite-react";
+import { useEffect, useState } from "react";
+import authAPI from "../../api/authAPI";
 import Human from "../../assets/Human.png";
 
 const Dashboard = () => {
+  const [roleCounts, setRoleCounts] = useState<{
+    admin: number;
+    teacher: number;
+    student: number;
+  } | null>(null);
+
+  useEffect(() => {
+    async function getRoleData() {
+      const data = await authAPI.fetchRoleCounts();
+      console.log(data);
+      if (data) setRoleCounts(data);
+    }
+    getRoleData();
+  }, []);
+
   return (
     <div className="mx-auto mt-4 max-w-6xl p-4 md:block">
       <div className="overflow-x-auto">
@@ -30,19 +46,19 @@ const Dashboard = () => {
               <div className="h-32 w-1/3 rounded-2xl bg-gradient-to-r from-green-400 via-green-500 to-green-600 px-6 py-3 text-sm font-medium text-white hover:bg-gradient-to-br focus:ring-4 focus:ring-green-300 focus:outline-none dark:focus:ring-green-800">
                 <h3 className="text-2xl font-light">Student</h3>
                 <h1 className="mt-4 text-4xl font-semibold tracking-widest">
-                  4000
+                  {roleCounts?.student}
                 </h1>
               </div>
               <div className="h-32 w-1/3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 text-sm font-medium text-white hover:bg-gradient-to-bl focus:ring-4 focus:ring-cyan-300 focus:outline-none dark:focus:ring-cyan-800">
                 <h3 className="text-2xl font-light">Teacher</h3>
                 <h1 className="mt-4 text-4xl font-semibold tracking-widest">
-                  123
+                  {roleCounts?.teacher}
                 </h1>
               </div>
               <div className="h-32 w-1/3 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 px-6 py-3 text-left text-sm font-medium text-white hover:bg-gradient-to-bl focus:ring-4 focus:ring-pink-200 focus:outline-none dark:focus:ring-pink-800">
                 <h3 className="text-2xl font-light">Manage</h3>
                 <h1 className="mt-4 text-4xl font-semibold tracking-widest">
-                  4
+                  {roleCounts?.admin}
                 </h1>
               </div>
             </div>

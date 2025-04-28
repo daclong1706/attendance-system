@@ -23,7 +23,10 @@ import LoadingModal from "../../components/modal/LoadingModal";
 import { Class } from "../../types/classType";
 import { Attendance } from "../../types/attendanceTypes";
 import SearchComponent from "../../components/ui/SearchComponent";
-import { getMatchingDates } from "../../helper/scheduleHelper";
+import {
+  formatDateString,
+  getMatchingDates,
+} from "../../helper/scheduleHelper";
 
 const AttendanceTeacher = () => {
   const dispatch = useAppDispatch();
@@ -36,17 +39,35 @@ const AttendanceTeacher = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClass, setSelectedClass] = useState<Class | null>(classes[0]);
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split("T")[0],
+    classes.length > 0
+      ? formatDateString(classes[0].start_date)
+      : new Date().toISOString().split("T")[0],
   );
 
   useEffect(() => {
     dispatch(fetchAllClassesByTeacher());
-    setUsers(attendanceList);
-  }, [dispatch, attendanceList]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (classes.length > 0 && !selectedClass) {
+      setSelectedClass(classes[0]);
+      const format = formatDateString(classes[0].start_date);
+      setSelectedDate(format);
+    }
+  }, [classes]);
+
+  useEffect(() => {
+    if (attendanceList.length > 0) {
+      setUsers(attendanceList);
+    } else {
+      setUsers(attendanceList);
+    }
+  }, [attendanceList]);
 
   useEffect(() => {
     if (selectedClass) {
       const dayOfWeek = new Date(selectedDate).getDay();
+      console.log(selectedDate, dayOfWeek, selectedClass.id);
       dispatch(
         fetchAttendanceByClass({
           class_section_id: selectedClass.id,

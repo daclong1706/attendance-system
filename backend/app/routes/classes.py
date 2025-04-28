@@ -15,7 +15,7 @@ class_bp = Blueprint("class_bp", __name__)
 @class_bp.route("", methods=["GET"])
 @jwt_required_middleware
 def get_class():
-    if g.user_role != 'admin':
+    if g.user_role == 'teacher':
             return jsonify({"message": "Forbidden: Admins only"}), 403
 
     class_sections = db.session.query(

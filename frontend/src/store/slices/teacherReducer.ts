@@ -135,7 +135,7 @@ const teacherSlice = createSlice({
         fetchAttendanceByClass.fulfilled,
         (state, action: PayloadAction<Attendance[]>) => {
           state.loading = false;
-          state.attendanceList = action.payload;
+          state.attendanceList = action.payload || [];
         },
       )
       .addCase(fetchAttendanceByClass.rejected, (state, action) => {
