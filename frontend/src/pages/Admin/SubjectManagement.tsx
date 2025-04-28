@@ -17,6 +17,8 @@ import { fetchAllSubjects } from "../../store/slices/subjectReducer";
 import { Subject } from "../../types/subjectType";
 import ActionComponent from "../../components/ui/ActionComponent";
 import DeleteModal from "../../components/modal/DeleteModal";
+import CreateSubjectForm from "./CreateSubjectFrom";
+import EditSubjectForm from "./EditSubjectForm";
 
 const SubjectManagement = () => {
   const itemsPerPage = 10;
@@ -24,7 +26,6 @@ const SubjectManagement = () => {
   const dispatch = useAppDispatch();
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -108,7 +109,6 @@ const SubjectManagement = () => {
                     <ActionComponent
                       data={d}
                       setSelectedData={setSelectedSubject}
-                      setIsViewOpen={setIsViewOpen}
                       setIsEditOpen={setIsEditOpen}
                       setIsDeleteOpen={setIsDeleteOpen}
                     />
@@ -136,10 +136,22 @@ const SubjectManagement = () => {
         />
       </div>
       <LoadingModal isOpen={loading} />
+      <CreateSubjectForm
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
+      {selectedSubject && (
+        <EditSubjectForm
+          subject={selectedSubject}
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
       {selectedSubject && (
         <DeleteModal
-          userName={selectedSubject.name}
-          userID={selectedSubject.id}
+          dataType="Subject"
+          dataName={selectedSubject.name}
+          dataID={selectedSubject.id}
           openModal={isDeleteOpen}
           setOpenModal={setIsDeleteOpen}
         />

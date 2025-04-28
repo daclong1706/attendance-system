@@ -79,7 +79,7 @@ const AttendanceStudent = () => {
       attendanceAll &&
       Object.keys(attendanceAll.attendance_history).length > 0
     ) {
-      const count = countAttendanceStatus(attendanceAll); // 🟢 Tạo `count` ngay trong `useEffect`
+      const count = countAttendanceStatus(attendanceAll);
       const newSeries = processSeriesData(count.status_counts);
       setState((prevState) => ({
         ...prevState,

@@ -182,8 +182,9 @@ const Home = () => {
       />
       {selectedUser && (
         <DeleteModal
-          userName={selectedUser.name}
-          userID={selectedUser.id}
+          dataType="User"
+          dataName={selectedUser.name}
+          dataID={selectedUser.id}
           openModal={isDeleteOpen}
           setOpenModal={setIsDeleteOpen}
         />
@@ -195,7 +196,7 @@ const Home = () => {
           onClose={() => setIsEditOpen(false)}
         />
       )}
-      \
+
       {selectedUser && (
         <ViewUserForm
           user={selectedUser}

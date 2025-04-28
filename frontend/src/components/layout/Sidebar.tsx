@@ -38,16 +38,16 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
       label: "Học phần",
       icon: icons.subject,
     },
-    {
-      path: "/admin/reports",
-      label: "Báo cáo",
-      icon: icons.reports,
-    },
-    {
-      path: "/admin/settings",
-      label: "Cài đặt",
-      icon: icons.settings,
-    },
+    // {
+    //   path: "/admin/reports",
+    //   label: "Báo cáo",
+    //   icon: icons.reports,
+    // },
+    // {
+    //   path: "/admin/settings",
+    //   label: "Cài đặt",
+    //   icon: icons.settings,
+    // },
   ];
 
   const teacherLinks = [
