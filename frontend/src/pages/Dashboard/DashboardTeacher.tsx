@@ -14,6 +14,7 @@ const DashboardTeacher = () => {
   useEffect(() => {
     dispatch(fetchAllClassesByTeacher());
   }, [dispatch]);
+  const colors = ["#8E7DBE", "#9EC6F3", "#BDDDE4", "#FFF1D5"];
 
   const [state, setState] = useState<{
     series: { data: number[] }[];
@@ -21,37 +22,32 @@ const DashboardTeacher = () => {
   }>({
     series: [],
     options: {
-      chart: { type: "bar", height: 350 },
-      colors: ["#28a745", "#ffc107", "#007bff", "#dc3545"],
-      title: {
-        text: "Thống kê số lượng sinh viên của lớp học",
-        align: "center",
-        style: {
-          fontSize: "16px",
-          fontWeight: "bold",
-          color: "#333",
+      chart: {
+        height: 350,
+        type: "bar",
+      },
+      colors: colors,
+      plotOptions: {
+        bar: {
+          columnWidth: "45%",
+          distributed: true,
         },
       },
-      plotOptions: {
-        bar: { horizontal: false, columnWidth: "55%", borderRadius: 5 },
+      dataLabels: {
+        enabled: false,
       },
       legend: {
         show: false,
       },
-      dataLabels: { enabled: false },
-      stroke: { show: true, width: 2, colors: ["transparent"] },
       xaxis: {
         categories: [],
         labels: {
           style: {
-            colors: ["#28a745", "#ffc107", "#007bff", "#dc3545"],
+            colors: colors,
             fontSize: "12px",
           },
         },
       },
-      yaxis: { title: { text: "Số sinh viên" } },
-      fill: { opacity: 1 },
-      tooltip: { y: { formatter: (val) => `${val} lần` } },
     },
   });
 

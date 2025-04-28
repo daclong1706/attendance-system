@@ -25,6 +25,21 @@ def get_all_users():
             for user in users
         ]
     }), 200
+    
+@user_bp.route("/getAllStudent", methods=["GET"])
+def get_all_students():
+    students = User.query.filter_by(role="student").with_entities(User.id, User.name, User.email, User.mssv).all()
+    return jsonify({
+        "data": [
+            {
+                "id": student.id,
+                "name": student.name,
+                "email": student.email,
+                "mssv": student.mssv,
+            }
+            for student in students
+        ]
+    }), 200
 
 @user_bp.route("/getUserInformation", methods=["GET"])
 def get_user_information():

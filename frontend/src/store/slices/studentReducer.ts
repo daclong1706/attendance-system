@@ -5,9 +5,11 @@ import {
   AttendanceHistory,
   AttendanceStatus,
 } from "../../types/attendanceTypes";
+import { Student } from "../../types/studentType";
 
 interface StudentState {
   schedule: Schedule[];
+  students: Student[];
   attendanceStatus: AttendanceStatus;
   attendanceAll: AttendanceHistory;
   loading: boolean;
@@ -16,6 +18,7 @@ interface StudentState {
 
 const initialState: StudentState = {
   schedule: [],
+  students: [],
   attendanceStatus: {
     student_id: 0,
     class_section_id: 0,
@@ -34,6 +37,18 @@ export const fetchScheduleByStudent = createAsyncThunk<Schedule[], void>(
   async (_, { rejectWithValue }) => {
     try {
       const response = await studentAPI.getSchedule();
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const fetchAllStudent = createAsyncThunk<Student[], void>(
+  "student/fetchAllStudent",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await studentAPI.getAllStudent();
       return response;
     } catch (error) {
       return rejectWithValue(error);
@@ -99,6 +114,23 @@ const studentSlice = createSlice({
         },
       )
       .addCase(fetchScheduleByStudent.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Không thể tìm thời khóa biểu";
+      })
+
+      .addCase(fetchAllStudent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchAllStudent.fulfilled,
+        (state, action: PayloadAction<Student[]>) => {
+          state.loading = false;
+          state.students = action.payload;
+        },
+      )
+      .addCase(fetchAllStudent.rejected, (state, action) => {
         state.loading = false;
         state.error =
           (action.payload as string) || "Không thể tìm thời khóa biểu";

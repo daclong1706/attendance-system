@@ -1,8 +1,19 @@
 import { AttendanceHistory, AttendanceStatus } from "../types/attendanceTypes";
 import { Schedule } from "../types/scheduleTypes";
+import { Student } from "../types/studentType";
 import axiosClient from "./axiosClient";
 
 class StudentAPI {
+  async getAllStudent(): Promise<Student[]> {
+    try {
+      const response = await axiosClient.get<Student[]>("user/getAllStudent");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getSchedule(): Promise<Schedule[]> {
     try {
       const response = await axiosClient.get<Schedule[]>("student/schedule");

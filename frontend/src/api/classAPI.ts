@@ -5,7 +5,6 @@ class ClassAPI {
   async getClass(): Promise<Class[]> {
     try {
       const response = await axiosClient.get<Class[]>("/class");
-      console.log(response);
       return response.data;
     } catch (error) {
       console.log(error);

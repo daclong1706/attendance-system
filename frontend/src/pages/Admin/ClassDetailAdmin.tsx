@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { fetchClassById } from "../../store/slices/teacherReducer";
 import LoadingModal from "../../components/modal/LoadingModal";
@@ -13,9 +13,13 @@ import TableCellComponent from "../../components/ui/table/TableCellComponent";
 import { Button } from "flowbite-react";
 import { FaPlusSquare } from "react-icons/fa";
 import FromAddStudent from "./FormAddStudent";
+import axiosClient from "../../api/axiosClient";
+import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
 
 const ClassDetailAdmin = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useAppDispatch();
   const { classDetail, loading, error } = useAppSelector(
     (state) => state.teacher,
@@ -28,16 +32,63 @@ const ClassDetailAdmin = () => {
     }
   }, [dispatch, id]);
 
+  const addStudentsToClass = async (students: number[]) => {
+    setIsLoading(true);
+    try {
+      const response = await axiosClient.post(`teacher/enrollment/${id}/add`, {
+        student_ids: students,
+      });
+
+      dispatch(fetchClassById(Number(id)));
+
+      showSuccessMessage("Thêm sinh viên thành công");
+      setIsLoading(false);
+      return response.data;
+    } catch {
+      showErrorMessage("Lỗi khi thêm sinh viên");
+      setIsLoading(false);
+    }
+  };
+
+  const addStudentsByExcel = async (file: File) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axiosClient.post(
+        `teacher/enrollment/${id}/add-xlsx`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+
+      dispatch(fetchClassById(Number(id)));
+
+      showSuccessMessage("Thêm sinh viên thành công");
+      setIsLoading(false);
+      return response.data;
+    } catch {
+      showErrorMessage("Lỗi khi thêm sinh viên");
+      setIsLoading(false);
+    }
+  };
+
+  const handleUploadExcel = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await addStudentsByExcel(file);
+  };
+
   if (error)
     return <div className="mt-10 text-center text-red-500">{error}</div>;
 
   return (
     <>
-      <div className="mx-auto mt-4 max-w-6xl rounded-lg bg-white p-6 shadow-lg dark:bg-gray-600">
-        <Button color="green" onClick={() => setIsAddOpen(true)}>
-          <FaPlusSquare className="mr-2 h-5 w-5" />
-          Sinh viên
-        </Button>
+      <div className="mx-auto mt-4 max-w-6xl rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
         <h2 className="mb-4 text-2xl font-bold text-red-700">
           {classDetail.subject_name} ({classDetail.subject_code})
         </h2>
@@ -60,6 +111,28 @@ const ClassDetailAdmin = () => {
           🟡 Thời gian kết thúc:{" "}
           <span>{formatDateDDMMYY(classDetail.end_date)}</span>
         </p>
+
+        <div className="mb-2 flex gap-2">
+          <Button color="green" onClick={() => setIsAddOpen(true)}>
+            <FaPlusSquare className="mr-2 h-5 w-5" />
+            Sinh viên
+          </Button>
+          <Button
+            color="green"
+            onClick={() => document.getElementById("fileUpload")?.click()}
+          >
+            <FaPlusSquare className="mr-2 h-5 w-5" />
+            Danh sách
+          </Button>
+
+          <input
+            type="file"
+            id="fileUpload"
+            accept=".xlsx"
+            onChange={handleUploadExcel}
+            className="hidden"
+          />
+        </div>
 
         <TableComponent>
           <TableHeadComponent>
@@ -112,7 +185,12 @@ const ClassDetailAdmin = () => {
         </TableComponent>
       </div>
       <LoadingModal isOpen={loading} />
-      <FromAddStudent isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
+      <LoadingModal isOpen={isLoading} />
+      <FromAddStudent
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        addStudentToClass={addStudentsToClass}
+      />
     </>
   );
 };

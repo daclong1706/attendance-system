@@ -294,9 +294,6 @@ def get_class_attendance():
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     data = request.get_json()
-    
-    print("Dữ liệu nhận được:", data)
-
     class_section_id = data.get("class_section_id")
     selected_date = data.get("selected_date")
     day_of_week = data.get("day_of_week")
@@ -329,16 +326,25 @@ def get_class_attendance():
         db.session.add(attendance_session)
         db.session.commit()
 
-        enrollments = Enrollment.query.filter_by(class_section_id=class_section_id).all()
-        for enrollment in enrollments:
+    # Lấy danh sách sinh viên mới nhất từ `Enrollment`
+    enrollments = Enrollment.query.filter_by(class_section_id=class_section_id).all()
+
+    for enrollment in enrollments:
+        existing_attendance = Attendance.query.filter_by(
+            student_id=enrollment.student.id, attendance_session_id=attendance_session.id
+        ).first()
+
+        if not existing_attendance:  # Nếu chưa có điểm danh, thêm mới
             attendance = Attendance(
                 student_id=enrollment.student.id,
                 attendance_session_id=attendance_session.id,
                 status="not_recorded"
             )
             db.session.add(attendance)
-        db.session.commit()
 
+    db.session.commit()
+
+    # Lấy danh sách điểm danh sau khi cập nhật
     attendances = Attendance.query.filter_by(attendance_session_id=attendance_session.id).all()
     students = [
         {
@@ -350,8 +356,8 @@ def get_class_attendance():
         }
         for attendance in attendances
     ]
-    
-    if len(students) == 0: 
+
+    if len(students) == 0:
         return jsonify({"message": "Không có dữ liệu điểm danh cho lớp này"}), 404
 
     return jsonify(
@@ -362,6 +368,7 @@ def get_class_attendance():
             }
         }
     ), 200
+
 
 @teacher_bp.route("/attendance/save", methods=["POST"])
 @jwt_required_middleware
@@ -471,7 +478,7 @@ def get_or_create_qr_code():
 @teacher_bp.route('/enrollment/<int:class_section_id>/add', methods=['POST'])
 @jwt_required_middleware
 def add_students_to_class_section(class_section_id):
-    if g.user_role != "teacher":
+    if g.user_role == "student":
         return jsonify({"message": "Forbidden: Teachers only"}), 403
     
     data = request.get_json()
@@ -521,7 +528,7 @@ def add_students_to_class_section(class_section_id):
 @teacher_bp.route('/enrollment/<int:class_section_id>/add-xlsx', methods=['POST'])
 @jwt_required_middleware
 def add_students_by_excel(class_section_id):
-    if g.user_role != "teacher":
+    if g.user_role == "student":
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     if 'file' not in request.files:
