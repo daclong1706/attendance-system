@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import authAPI from "../../api/authAPI";
 import Human from "../../assets/Human.png";
 
-const Dashboard = () => {
+const DashboardAdmin = () => {
   const [roleCounts, setRoleCounts] = useState<{
     admin: number;
     teacher: number;
@@ -78,4 +78,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardAdmin;

@@ -1,30 +1,34 @@
-import { AiOutlineSearch } from "react-icons/ai";
-import { FaPlusSquare } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTable } from "../../components/hook/useTable";
+import LoadingModal from "../../components/modal/LoadingModal";
+import ActionComponent from "../../components/ui/ActionComponent";
 import PaginationComponent from "../../components/ui/PanigationComponent";
+import SearchComponent from "../../components/ui/SearchComponent";
 import TableBodyComponent from "../../components/ui/table/TableBodyComponent";
 import TableCellComponent from "../../components/ui/table/TableCellComponent";
 import TableComponent from "../../components/ui/table/TableComponent";
 import TableHeadCellComponent from "../../components/ui/table/TableHeadCellComponent";
 import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
 import TableRowComponent from "../../components/ui/table/TableRowComponent";
+import { getClassStatus } from "../../helper/scheduleHelper";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { useEffect, useState } from "react";
 import { fetchAllClassesByTeacher } from "../../store/slices/teacherReducer";
-import SearchComponent from "../../components/ui/SearchComponent";
-import { Button } from "flowbite-react";
-import ActionComponent from "../../components/ui/ActionComponent";
-import LoadingModal from "../../components/modal/LoadingModal";
+import { Class } from "../../types/classType";
 
 const ClassList = () => {
   const itemsPerPage = 10;
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  useEffect(() => {
+    if (isViewOpen && selectedClass?.id) {
+      navigate(`${selectedClass.id}`);
+    }
+  }, [isViewOpen, selectedClass, navigate]);
 
   const { classes, loading } = useAppSelector((state) => state.teacher);
 
@@ -81,6 +85,7 @@ const ClassList = () => {
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
               />
+              <TableHeadCellComponent columnName="status" label="Trạng thái" />
               <TableHeadCellComponent
                 columnName="action"
                 className="rounded-r-xl"
@@ -100,13 +105,26 @@ const ClassList = () => {
                   <TableCellComponent>{d.subject_code}</TableCellComponent>
                   <TableCellComponent>{d.subject_name}</TableCellComponent>
                   <TableCellComponent>{d.student_count}</TableCellComponent>
+                  <TableCellComponent>
+                    <div
+                      className={`rounded-full px-2 py-1 text-center font-medium ${
+                        getClassStatus(d.start_date, d.end_date) ===
+                        "Đang hoạt động"
+                          ? "bg-green-500 text-white"
+                          : getClassStatus(d.start_date, d.end_date) ===
+                              "Chưa bắt đầu"
+                            ? "bg-blue-500 text-white"
+                            : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {getClassStatus(d.start_date, d.end_date)}
+                    </div>
+                  </TableCellComponent>
                   <TableCellComponent className="rounded-r-xl border-r-2">
                     <ActionComponent
                       data={d}
                       setSelectedData={setSelectedClass}
                       setIsViewOpen={setIsViewOpen}
-                      setIsEditOpen={setIsEditOpen}
-                      setIsDeleteOpen={setIsDeleteOpen}
                     />
                   </TableCellComponent>
                 </TableRowComponent>

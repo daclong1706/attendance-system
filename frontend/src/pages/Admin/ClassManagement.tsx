@@ -16,6 +16,7 @@ import LoadingModal from "../../components/modal/LoadingModal";
 import ActionComponent from "../../components/ui/ActionComponent";
 import { Button } from "flowbite-react";
 import SearchComponent from "../../components/ui/SearchComponent";
+import { useNavigate } from "react-router-dom";
 
 const ClassManagement = () => {
   const itemsPerPage = 10;
@@ -24,8 +25,14 @@ const ClassManagement = () => {
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isViewOpen && selectedClass?.id) {
+      navigate(`${selectedClass.id}`);
+    }
+  }, [isViewOpen, selectedClass, navigate]);
 
   const { classes, loading } = useAppSelector((state) => state.class);
 
@@ -121,7 +128,6 @@ const ClassManagement = () => {
                       data={d}
                       setSelectedData={setSelectedClass}
                       setIsViewOpen={setIsViewOpen}
-                      setIsEditOpen={setIsEditOpen}
                       setIsDeleteOpen={setIsDeleteOpen}
                     />
                   </TableCellComponent>

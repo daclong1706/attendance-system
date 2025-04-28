@@ -1,4 +1,4 @@
-import { DarkThemeToggle } from "flowbite-react";
+import { Button, DarkThemeToggle } from "flowbite-react";
 import {
   Avatar,
   Dropdown,
@@ -10,6 +10,8 @@ import {
   NavbarToggle,
 } from "flowbite-react";
 import { useAppSelector } from "../../store/hook";
+import { useLocation, useNavigate } from "react-router-dom";
+import { HiArrowLeft } from "react-icons/hi";
 
 interface Props {
   toggleSidebar: () => void;
@@ -17,11 +19,23 @@ interface Props {
 
 const Header = ({ toggleSidebar }: Props) => {
   const user = useAppSelector((state) => state.auth.user);
+  const location = useLocation(); // Lấy đường dẫn hiện tại
+  const navigate = useNavigate();
+
+  // Kiểm tra nếu đường dẫn chứa "admin/class-management/:id" hoặc "teacher/class/:id"
+  const showBackButton =
+    /^\/(admin\/class-management|teacher\/class)\/\d+$/.test(location.pathname);
+
   return (
     <>
       <Navbar fluid rounded className="rounded-2xl shadow">
         <NavbarBrand>
           <NavbarToggle onClick={toggleSidebar} />
+          {showBackButton && (
+            <Button onClick={() => navigate(-1)}>
+              <HiArrowLeft />
+            </Button>
+          )}
         </NavbarBrand>
         <div className="flex gap-2 md:order-2">
           <DarkThemeToggle />

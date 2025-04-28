@@ -26,6 +26,14 @@ export const formatDateString = (dateString: string): string => {
   return date.toISOString().split("T")[0]; // Lấy định dạng `YYYY-MM-DD`
 };
 
+export const formatDateDDMMYY = (dateString: string): string => {
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString();
+  return `${day}/${month}/${year}`;
+};
+
 export const generateWeeks = (startDate: Date, endDate: Date) => {
   const weeks = [];
   const current = new Date(startDate);
@@ -134,4 +142,34 @@ export const getMatchingDates = (
   }
 
   return resultDates;
+};
+
+export const getClassStatus = (
+  startDateStr: string,
+  endDateStr: string,
+): string => {
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+  const currentDate = new Date();
+
+  if (currentDate < startDate) {
+    return "Chưa bắt đầu";
+  } else if (currentDate >= startDate && currentDate <= endDate) {
+    return "Đang hoạt động";
+  } else {
+    return "Đã kết thúc";
+  }
+};
+
+export const getDayOfWeek = (day: number): string => {
+  const days = [
+    "Chủ Nhật",
+    "Thứ Hai",
+    "Thứ Ba",
+    "Thứ Tư",
+    "Thứ Năm",
+    "Thứ Sáu",
+    "Thứ Bảy",
+  ];
+  return days[day] || "Không xác định";
 };

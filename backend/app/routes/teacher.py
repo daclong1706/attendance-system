@@ -82,9 +82,6 @@ def get_teacher_classes():
 @teacher_bp.route("/classes/<int:class_section_id>", methods=["GET"])
 @jwt_required_middleware
 def get_class_details(class_section_id):
-    if g.user_role != 'teacher':
-        return jsonify({"message": "Forbidden: Teachers only"}), 403
-    
     # Fetch the class section by ID
     class_section = ClassSection.query.get(class_section_id)
     if not class_section:
@@ -115,6 +112,8 @@ def get_class_details(class_section_id):
             "day_of_week": class_section.day_of_week,
             "start_time": class_section.start_time.strftime('%H:%M'),
             "end_time": class_section.end_time.strftime('%H:%M'),
+            "start_date": class_section.start_date.strftime('%Y-%m-%d'),
+            "end_date": class_section.end_date.strftime('%Y-%m-%d'),
             "students": students
         }
     }), 200

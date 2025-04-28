@@ -59,10 +59,10 @@ export const processChartData = (
 
   Object.entries(attendanceAll.attendance_history).forEach(
     ([classId, records]) => {
-      const classData = classes.find((c) => c.id === Number(classId)); // 🔍 Tìm lớp học
+      const classData = classes.find((c) => c.id === Number(classId));
       if (!classData) return;
 
-      categories.push(classData.subject_name); // 🟢 Thêm môn học vào `categories`
+      categories.push(classData.subject_name);
 
       const countPerStatus = {
         present: 0,
@@ -73,12 +73,12 @@ export const processChartData = (
 
       records.forEach((record) => {
         if (record.attendance_status !== "not_recorded") {
-          countPerStatus[record.attendance_status]++; // 🔹 Đếm số lần theo từng trạng thái
+          countPerStatus[record.attendance_status]++;
         }
       });
 
       statusTypes.forEach((status) => {
-        statusCounts[status].push(countPerStatus[status]); // 🟢 Lưu dữ liệu vào từng `series`
+        statusCounts[status].push(countPerStatus[status]);
       });
     },
   );

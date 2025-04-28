@@ -2,7 +2,7 @@ import {
   AttendanceRequest,
   AttendanceResponse,
 } from "../types/attendanceTypes";
-import { Class } from "../types/classType";
+import { Class, ClassDetail } from "../types/classType";
 import { Schedule } from "../types/scheduleTypes";
 import axiosClient from "./axiosClient";
 
@@ -13,6 +13,18 @@ class TeacherAPI {
       return response.data;
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+
+  async getClassDetail(classId: number): Promise<ClassDetail> {
+    try {
+      const response = await axiosClient.get<ClassDetail>(
+        `teacher/classes/${classId}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching class details:", error);
       throw error;
     }
   }

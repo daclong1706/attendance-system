@@ -1,6 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
-import Dashboard from "./pages/Dashboard/Dashboard";
 import UserManagement from "./pages/Admin/UserManagement";
 import { ThemeProvider } from "flowbite-react";
 import { theme } from "./components/utils/theme";
@@ -16,6 +15,11 @@ import { store } from "./store/store";
 import SubjectManagement from "./pages/Admin/SubjectManagement";
 import AttendanceTeacher from "./pages/Teacher/Attendance";
 import AttendanceStudent from "./pages/Student/AttendanceStudent";
+import ClassDetailTeacher from "./pages/Teacher/ClassDetailTeacher";
+import DashboardStudent from "./pages/Dashboard/DashboardStudent";
+import DashboardTeacher from "./pages/Dashboard/DashboardTeacher";
+import DashboardAdmin from "./pages/Dashboard/DashboardAdmin";
+import ClassDetailAdmin from "./pages/Admin/ClassDetailAdmin";
 
 export default function App() {
   return (
@@ -37,7 +41,7 @@ export default function App() {
               }
             >
               <Route index element={<Navigate to="/student/dashboard" />} />
-              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dashboard" element={<DashboardStudent />} />
               <Route path="schedule" element={<ScheduleStudent />} />
               <Route path="attendance-status" element={<AttendanceStudent />} />
               {/* <Route path="/schedule" element={<SchedulePage />} /> */}
@@ -51,8 +55,9 @@ export default function App() {
               }
             >
               <Route index element={<Navigate to="/teacher/dashboard" />} />
-              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dashboard" element={<DashboardTeacher />} />
               <Route path="class" element={<ClassList />} />
+              <Route path="class/:id" element={<ClassDetailTeacher />} />
               <Route path="attendance" element={<AttendanceTeacher />} />
               <Route path="schedule" element={<Schedule />} />
               {/* <Route path="/schedule" element={<SchedulePage />} /> */}
@@ -66,10 +71,14 @@ export default function App() {
               }
             >
               <Route index element={<Navigate to="/admin/dashboard" />} />
-              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dashboard" element={<DashboardAdmin />} />
               <Route path="user-management" element={<UserManagement />} />
               <Route path="attendance" element={<AttendanceTeacher />} />
               <Route path="class-management" element={<ClassManagement />} />
+              <Route
+                path="class-management/:id"
+                element={<ClassDetailAdmin />}
+              />
               <Route
                 path="subject-management"
                 element={<SubjectManagement />}

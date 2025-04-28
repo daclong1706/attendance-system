@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Class } from "../../types/classType";
+import { Class, ClassDetail } from "../../types/classType";
 import teacherAPI from "../../api/teacherAPI";
 import { Schedule } from "../../types/scheduleTypes";
 import { Attendance, AttendanceRequest } from "../../types/attendanceTypes";
 
 interface TeacherState {
   classes: Class[];
+  classDetail: ClassDetail;
   schedule: Schedule[];
   attendanceList: Attendance[];
   loading: boolean;
@@ -15,6 +16,18 @@ interface TeacherState {
 const initialState: TeacherState = {
   classes: [],
   schedule: [],
+  classDetail: {
+    id: 0,
+    subject_name: "",
+    subject_code: "",
+    room: "",
+    day_of_week: "",
+    start_time: "",
+    end_time: "",
+    start_date: "",
+    end_date: "",
+    students: [],
+  },
   attendanceList: [],
   loading: false,
   error: null,
@@ -25,6 +38,18 @@ export const fetchAllClassesByTeacher = createAsyncThunk<Class[], void>(
   async (_, { rejectWithValue }) => {
     try {
       const response = await teacherAPI.getAllClass();
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const fetchClassById = createAsyncThunk<ClassDetail, number>(
+  "class/fetchClassById",
+  async (classId, { rejectWithValue }) => {
+    try {
+      const response = await teacherAPI.getClassDetail(classId);
       return response;
     } catch (error) {
       return rejectWithValue(error);
@@ -89,6 +114,18 @@ const teacherSlice = createSlice({
       state.classes = [];
       state.schedule = [];
       state.attendanceList = [];
+      state.classDetail = {
+        id: 0,
+        subject_name: "",
+        subject_code: "",
+        room: "",
+        day_of_week: "",
+        start_time: "",
+        end_time: "",
+        start_date: "",
+        end_date: "",
+        students: [],
+      };
     },
   },
   extraReducers: (builder) => {
@@ -108,6 +145,22 @@ const teacherSlice = createSlice({
         state.loading = false;
         state.error =
           (action.payload as string) || "Không thể tải danh sách lớp!";
+      })
+
+      .addCase(fetchClassById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchClassById.fulfilled,
+        (state, action: PayloadAction<ClassDetail>) => {
+          state.loading = false;
+          state.classDetail = action.payload;
+        },
+      )
+      .addCase(fetchClassById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = (action.payload as string) || "Không thể tải lớp!";
       })
 
       .addCase(fetchScheduleByTeacher.pending, (state) => {

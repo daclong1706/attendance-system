@@ -63,7 +63,7 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
       label: "Thời khóa biểu",
       icon: icons.scheduleManagement,
     },
-    { path: "/teacher/reports", label: "Báo cáo lớp học", icon: icons.reports },
+    // { path: "/teacher/reports", label: "Báo cáo lớp học", icon: icons.reports },
   ];
 
   const studentLinks = [
@@ -78,16 +78,16 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
       label: "Tình trạng điểm danh",
       icon: icons.attendance,
     },
-    {
-      path: "/student/notifications",
-      label: "Thông báo",
-      icon: icons.notification,
-    },
-    {
-      path: "/student/personal-report",
-      label: "Báo cáo cá nhân",
-      icon: icons.reports,
-    },
+    // {
+    //   path: "/student/notifications",
+    //   label: "Thông báo",
+    //   icon: icons.notification,
+    // },
+    // {
+    //   path: "/student/personal-report",
+    //   label: "Báo cáo cá nhân",
+    //   icon: icons.reports,
+    // },
   ];
 
   const getLinks = () => {

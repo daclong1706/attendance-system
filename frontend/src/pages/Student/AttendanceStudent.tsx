@@ -120,7 +120,6 @@ const AttendanceStudent = () => {
   });
 
   useEffect(() => {
-    console.log(attendanceAll, classes.length);
     if (attendanceAll && classes.length > 0) {
       const { statusCounts, categories } = processChartData(
         attendanceAll,
