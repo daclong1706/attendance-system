@@ -1,9 +1,12 @@
 from flask import Blueprint, request, jsonify, g
 from app.models.user import User
+from app.models.enrollment import Enrollment
+from app.models.class_section import ClassSection
 from app.extensions import db
 from app.middlewares.auth_middleware import jwt_required_middleware
 from werkzeug.security import generate_password_hash
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 bcrypt = Bcrypt()
 
@@ -105,3 +108,114 @@ def update_user(user_id):
             }
         }
     }), 200
+
+@admin_bp.route('/enrollment/<int:class_section_id>/remove/<int:student_id>', methods=['DELETE'])
+@jwt_required_middleware
+def remove_student_from_class(class_section_id, student_id):
+    if g.user_role != 'admin':
+        return jsonify({"message": "Forbidden: Admins only"}), 403
+    
+    enrollment = Enrollment.query.filter_by(
+        class_section_id=class_section_id,
+        student_id=student_id
+    ).first()
+
+    if not enrollment:
+        return jsonify({'error': 'Enrollment not found'}), 404
+
+    db.session.delete(enrollment)
+    db.session.commit()
+
+    return jsonify({'message': f'Student {student_id} removed from class section {class_section_id}'}), 200
+
+@admin_bp.route('/class/add', methods=['POST'])
+@jwt_required_middleware
+def create_class_section():
+    if g.user_role != 'admin':
+        return jsonify({"message": "Forbidden: Admins only"}), 403
+    
+    data = request.get_json()
+
+    required_fields = [
+        'subject_id', 'teacher_id', 'room',
+        'day_of_week', 'start_time', 'end_time',
+        'start_date', 'end_date', 'semester', 'year'
+    ]
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing field: {field}'}), 400
+
+    try:
+        class_section = ClassSection(
+            subject_id=data['subject_id'],
+            teacher_id=data['teacher_id'],
+            room=data['room'],
+            day_of_week=data['day_of_week'],
+            start_time=datetime.strptime(data['start_time'], '%H:%M').time(),
+            end_time=datetime.strptime(data['end_time'], '%H:%M').time(),
+            start_date=datetime.strptime(data['start_date'], '%Y-%m-%d').date(),
+            end_date=datetime.strptime(data['end_date'], '%Y-%m-%d').date(),
+            semester=data['semester'],
+            year=data['year']
+        )
+
+        db.session.add(class_section)
+        db.session.commit()
+
+        return jsonify({'message': 'Class section created successfully', 'id': class_section.id}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/class/update/<int:class_section_id>', methods=['PUT'])
+@jwt_required_middleware
+def update_class_section(class_section_id):
+    data = request.get_json()
+    class_section = ClassSection.query.get(class_section_id)
+
+    if not class_section:
+        return jsonify({'error': 'Class section not found'}), 404
+
+    try:
+        if 'subject_id' in data:
+            class_section.subject_id = data['subject_id']
+        if 'teacher_id' in data:
+            class_section.teacher_id = data['teacher_id']
+        if 'room' in data:
+            class_section.room = data['room']
+        if 'day_of_week' in data:
+            class_section.day_of_week = data['day_of_week']
+        if 'start_time' in data:
+            class_section.start_time = datetime.strptime(data['start_time'], '%H:%M').time()
+        if 'end_time' in data:
+            class_section.end_time = datetime.strptime(data['end_time'], '%H:%M').time()
+        if 'start_date' in data:
+            class_section.start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+        if 'end_date' in data:
+            class_section.end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+        if 'semester' in data:
+            class_section.semester = data['semester']
+        if 'year' in data:
+            class_section.year = data['year']
+
+        db.session.commit()
+        return jsonify({'message': 'Class section updated successfully'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@admin_bp.route('/class/delete/<int:class_section_id>', methods=['DELETE'])
+@jwt_required_middleware
+def delete_class_section(class_section_id):
+    class_section = ClassSection.query.get(class_section_id)
+
+    if not class_section:
+        return jsonify({'error': 'Class section not found'}), 404
+
+    try:
+        db.session.delete(class_section)
+        db.session.commit()
+        return jsonify({'message': 'Class section deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
