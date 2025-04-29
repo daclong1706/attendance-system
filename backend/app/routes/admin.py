@@ -171,6 +171,9 @@ def create_class_section():
 @admin_bp.route('/class/update/<int:class_section_id>', methods=['PUT'])
 @jwt_required_middleware
 def update_class_section(class_section_id):
+    if g.user_role != 'admin':
+        return jsonify({"message": "Forbidden: Admins only"}), 403
+
     data = request.get_json()
     class_section = ClassSection.query.get(class_section_id)
 
@@ -208,6 +211,9 @@ def update_class_section(class_section_id):
 @admin_bp.route('/class/delete/<int:class_section_id>', methods=['DELETE'])
 @jwt_required_middleware
 def delete_class_section(class_section_id):
+    if g.user_role != 'admin':
+        return jsonify({"message": "Forbidden: Admins only"}), 403
+        
     class_section = ClassSection.query.get(class_section_id)
 
     if not class_section:
