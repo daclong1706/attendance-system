@@ -5,7 +5,7 @@ from datetime import datetime
 from deepface import DeepFace
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
-from capture_camera import capture_face
+from app.Model.scripts.capture_camera import capture_face
 import cv2
 
 
@@ -50,7 +50,7 @@ def convert_npy_to_image(npy_path):
     return img
 
 
-def mark_attendance(image_path, users_dir='data/users', threshold=0.5, attendance_file='attendance_records/attendance.csv'):
+def mark_attendance(image_path, users_dir='D:\\Project\\attendance-system\\backend\\app\\Model\\scripts\\data\\users', threshold=0.5, attendance_file='D:\\Project\\attendance-system\\backend\\app\\Model\\scripts\\attendance_records\\attendance.csv'):
     """
     Đánh dấu điểm danh dựa trên ảnh đầu vào.
 

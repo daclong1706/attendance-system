@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { MdClose } from "react-icons/md";
 
 interface Props {
@@ -5,6 +6,14 @@ interface Props {
 }
 
 const QRAttendance = ({ onClose }: Props) => {
+  const [qrSrc, setQrSrc] = useState("");
+
+  const generateQRCode = () => {
+    const data = "Hello, world!"; // Dữ liệu để tạo mã QR
+    const url = `http://localhost:5000/generate_qr/${encodeURIComponent(data)}`;
+    setQrSrc(url);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:text-black">
       <div className="relative w-full max-w-sm rounded-lg bg-white p-6 shadow-lg md:max-w-md">
@@ -21,11 +30,14 @@ const QRAttendance = ({ onClose }: Props) => {
         {/* Nội dung chính */}
         <div className="mt-4">
           <div className="flex items-center justify-center overflow-y-auto rounded border-2 border-gray-500 p-4 md:h-[400px] md:w-[400px]">
-            <img
+            <button onClick={generateQRCode}>Tạo mã QR</button>
+            {qrSrc && <img src={qrSrc} alt="QR Code" />}
+
+            {/* <img
               src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" // Thay bằng
               alt="QR Code"
               className="h-full w-full"
-            />
+            /> */}
           </div>
         </div>
 

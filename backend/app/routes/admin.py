@@ -115,10 +115,14 @@ def remove_student_from_class(class_section_id, student_id):
     if g.user_role != 'admin':
         return jsonify({"message": "Forbidden: Admins only"}), 403
     
+    print(class_section_id, student_id)
+    
     enrollment = Enrollment.query.filter_by(
         class_section_id=class_section_id,
         student_id=student_id
     ).first()
+    
+    
 
     if not enrollment:
         return jsonify({'error': 'Enrollment not found'}), 404

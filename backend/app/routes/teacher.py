@@ -294,6 +294,7 @@ def get_class_attendance():
         return jsonify({"message": "Forbidden: Teachers only"}), 403
 
     data = request.get_json()
+    print(data)
     class_section_id = data.get("class_section_id")
     selected_date = data.get("selected_date")
     day_of_week = data.get("day_of_week")

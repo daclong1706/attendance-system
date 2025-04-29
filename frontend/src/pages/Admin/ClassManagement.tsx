@@ -17,6 +17,7 @@ import ActionComponent from "../../components/ui/ActionComponent";
 import { Button } from "flowbite-react";
 import SearchComponent from "../../components/ui/SearchComponent";
 import { useNavigate } from "react-router-dom";
+import CreateClassForm from "./CreateClassForm";
 
 const ClassManagement = () => {
   const itemsPerPage = 10;
@@ -154,6 +155,11 @@ const ClassManagement = () => {
         />
       </div>
       <LoadingModal isOpen={loading} />
+
+      <CreateClassForm
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
     </div>
   );
 };
