@@ -1,0 +1,10 @@
+numpy
+tqdm
+scikit-learn
+deepface
+matplotlib
+opencv-python
+pandas
+tensorflow
+tf-keras
+mtcnn
