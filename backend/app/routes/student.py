@@ -6,6 +6,7 @@ from app.models.enrollment import Enrollment
 from app.models.attendance import AttendanceSession, Attendance
 from app.middlewares.auth_middleware import jwt_required_middleware
 from app.extensions import db, bcrypt
+from datetime import datetime
 
 student_bp = Blueprint("student_bp", __name__)
 
@@ -90,7 +91,7 @@ def get_student_schedule():
 @jwt_required_middleware
 def get_student_attendance_history():
     if g.user_role != "student":
-        return jsonify({"message": "Forbidden: Teachers only"}), 403
+        return jsonify({"message": "Forbidden: Students only"}), 403
 
     data = request.get_json()
     print("Dữ liệu nhận được:", data)
@@ -160,3 +161,41 @@ def get_student_full_attendance_history():
         }
     }), 200
 
+@student_bp.route('/attendance/mark-present', methods=['PUT'])
+@jwt_required_middleware
+def mark_present_by_qr():
+    data = request.get_json()
+    qr_code = data.get("qr_code")
+
+    if not qr_code:
+        return jsonify({"error": "QR code is required"}), 400
+
+    attendance_session = AttendanceSession.query.filter(
+        (AttendanceSession.qr_code_start == qr_code) |
+        (AttendanceSession.qr_code_end == qr_code)
+    ).first()
+
+    if not attendance_session:
+        return jsonify({"error": "Invalid QR code"}), 404
+
+    student_id = int(g.user_id)
+
+    print("test",g.user_id)
+
+    attendance = Attendance.query.filter_by(
+        attendance_session_id=attendance_session.id,
+        student_id=student_id
+    ).first()
+
+    if not attendance:
+        return jsonify({"error": "Student not enrolled in this session"}), 404
+
+    if attendance.status == "present":
+        return jsonify({"message": "Already marked as present"}), 200
+
+    attendance.status = "present"
+    attendance.checked_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({"message": "Marked as present"}), 200

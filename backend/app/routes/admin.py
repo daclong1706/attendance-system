@@ -229,3 +229,20 @@ def delete_class_section(class_section_id):
         return jsonify({'message': 'Class section deleted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@admin_bp.route('/teachers', methods=['GET'])
+@jwt_required_middleware
+def get_teacher_list():
+    teachers = User.query.filter_by(role="teacher").all()
+
+    teacher_list = [
+        {
+            "id": teacher.id,
+            "mssv": teacher.mssv,
+            "name": teacher.name,
+            "email": teacher.email
+        }
+        for teacher in teachers
+    ]
+
+    return jsonify({"teachers": teacher_list}), 200
