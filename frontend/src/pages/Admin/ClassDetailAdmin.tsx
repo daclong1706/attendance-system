@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { fetchClassById } from "../../store/slices/teacherReducer";
+import {
+  deleteStudent,
+  fetchClassById,
+} from "../../store/slices/teacherReducer";
 import LoadingModal from "../../components/modal/LoadingModal";
 import { formatDateDDMMYY, getDayOfWeek } from "../../helper/scheduleHelper";
 import TableComponent from "../../components/ui/table/TableComponent";
@@ -11,7 +14,7 @@ import TableHeadCellComponent from "../../components/ui/table/TableHeadCellCompo
 import TableBodyComponent from "../../components/ui/table/TableBodyComponent";
 import TableCellComponent from "../../components/ui/table/TableCellComponent";
 import { Button } from "flowbite-react";
-import { FaPlusSquare } from "react-icons/fa";
+import { FaPlusSquare, FaTrashAlt } from "react-icons/fa";
 import FromAddStudent from "./FormAddStudent";
 import axiosClient from "../../api/axiosClient";
 import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
@@ -82,6 +85,15 @@ const ClassDetailAdmin = () => {
     if (!file) return;
     await addStudentsByExcel(file);
   };
+  const handleDelete = async (class_session_id: number, student_id: number) => {
+    console.log(student_id);
+    dispatch(
+      deleteStudent({
+        class_session_id: class_session_id,
+        student_id: student_id,
+      }),
+    );
+  };
 
   if (error)
     return <div className="mt-10 text-center text-red-500">{error}</div>;
@@ -147,9 +159,10 @@ const ClassDetailAdmin = () => {
                 label="Mã số sinh viên"
               />
               <TableHeadCellComponent columnName="name" label="Họ và Tên" />
+              <TableHeadCellComponent columnName="email" label="Email" />
               <TableHeadCellComponent
-                columnName="email"
-                label="Email"
+                columnName="delete"
+                label="Xóa"
                 className="rounded-r-xl"
               />
             </TableRowComponent>
@@ -166,8 +179,16 @@ const ClassDetailAdmin = () => {
                   </TableCellComponent>
                   <TableCellComponent>{student.mssv}</TableCellComponent>
                   <TableCellComponent>{student.name}</TableCellComponent>
+                  <TableCellComponent>{student.email}</TableCellComponent>
                   <TableCellComponent className="rounded-r-xl border-r-2">
-                    {student.email}
+                    <button
+                      className="cursor-pointer text-neutral-400 hover:text-red-400"
+                      onClick={() => {
+                        handleDelete(Number(id), student.id);
+                      }}
+                    >
+                      <FaTrashAlt className="h-5 w-5" />
+                    </button>
                   </TableCellComponent>
                 </TableRowComponent>
               ))

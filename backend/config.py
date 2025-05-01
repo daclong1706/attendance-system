@@ -13,8 +13,8 @@ class Config:
     # db_user=db_user, db_password=db_password, db_name=db_name)
 
     """phpMyAdmin connection string here"""
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://{db_user}@localhost:3306/{db_name}".format(
-    db_user=db_user, db_password=db_password, db_name=db_name)
+    # SQLALCHEMY_DATABASE_URI = "mysql+pymysql://{db_user}@localhost:3306/{db_name}".format(
+    # db_user=db_user, db_password=db_password, db_name=db_name)
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY= os.environ['JWT_SECRET_KEY']

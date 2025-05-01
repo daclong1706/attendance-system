@@ -3,6 +3,8 @@ import { Class, ClassDetail } from "../../types/classType";
 import teacherAPI from "../../api/teacherAPI";
 import { Schedule } from "../../types/scheduleTypes";
 import { Attendance, AttendanceRequest } from "../../types/attendanceTypes";
+import { Student } from "../../types/studentType";
+import classAPI from "../../api/classAPI";
 
 interface TeacherState {
   classes: Class[];
@@ -85,6 +87,24 @@ export const fetchAttendanceByClass = createAsyncThunk<
   }
 });
 
+export const deleteStudent = createAsyncThunk<
+  { message: string },
+  {
+    class_session_id: number;
+    student_id: number;
+  }
+>("teacher/deleteStudent", async (data, { rejectWithValue }) => {
+  try {
+    const response = await classAPI.deleteStudent(
+      data.class_session_id,
+      data.student_id,
+    );
+    return response;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
 export const saveAttendance = createAsyncThunk<
   void,
   {
@@ -142,6 +162,22 @@ const teacherSlice = createSlice({
         },
       )
       .addCase(fetchAllClassesByTeacher.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Không thể tải danh sách lớp!";
+      })
+
+      .addCase(deleteStudent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteStudent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.classDetail.students = state.classDetail.students.filter(
+          (user) => user.id !== action.meta.arg.student_id,
+        );
+      })
+      .addCase(deleteStudent.rejected, (state, action) => {
         state.loading = false;
         state.error =
           (action.payload as string) || "Không thể tải danh sách lớp!";

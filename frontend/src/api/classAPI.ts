@@ -11,6 +11,34 @@ class ClassAPI {
       throw error;
     }
   }
+
+  async deleteStudent(
+    class_session_id: number,
+    student_id: number,
+  ): Promise<{ message: string }> {
+    try {
+      const response = await axiosClient.delete<{ message: string }>(
+        `admin/enrollment/${class_session_id}/remove/${student_id}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async createClass(newClass: Class): Promise<{ message: string; id: number }> {
+    try {
+      const response = await axiosClient.post<{ message: string; id: number }>(
+        "/class/add",
+        newClass,
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 const classAPI = new ClassAPI();

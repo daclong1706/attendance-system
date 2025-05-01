@@ -7,3 +7,4 @@ from .student import student_bp
 from .debug import debug_bp
 from .classes import class_bp
 from .qr import qr_bp
+from .recognition import recognition_bp
