@@ -26,6 +26,7 @@ axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     }
 
     config.headers.Accept = "application/json";
+    // config.withCredentials = true;
 
     return config;
   } catch (error) {
@@ -36,26 +37,14 @@ axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
 // Response Interceptor
 axiosClient.interceptors.response.use(
-  (res: AxiosResponse) => res.data,
-  (error: AxiosError<ApiErrorResponse>) => {
-    if (
-      error.response &&
-      [
-        "Invalid email or password.",
-        "Email not found.",
-        "Email is already in use. Try logging in instead.",
-        "Current password is incorrect.",
-      ].includes(error.response.data.message)
-    ) {
-      return Promise.reject(error);
+  (res: AxiosResponse) => {
+    if (typeof res.data === "string" && res.data.includes("<!DOCTYPE html>")) {
+      console.error("Ngrok returned HTML instead of JSON");
+      return Promise.reject(new Error("Invalid response format"));
     }
-
-    console.error(
-      `Error in axios response:`,
-      error.response?.data || error.message,
-    );
-    return Promise.reject(error);
+    return res.data;
   },
+  (error: AxiosError<ApiErrorResponse>) => Promise.reject(error),
 );
 
 export default axiosClient;

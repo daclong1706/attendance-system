@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.extensions import db, bcrypt
 from app.models.user import User
 from flask_jwt_extended import create_access_token
+from sqlalchemy import func
 
 auth_bp = Blueprint("auth_bp", __name__)
 
@@ -32,7 +33,6 @@ def login():
     
 @auth_bp.route("/role-count", methods=["GET"])
 def count_roles():
-    from sqlalchemy import func
 
     role_counts = (
         db.session.query(User.role, func.count(User.id))

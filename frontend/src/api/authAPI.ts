@@ -26,6 +26,7 @@ class AuthAPI {
         teacher: number;
         student: number;
       }>("/auth/role-count");
+
       return response.data;
     } catch (error) {
       console.error("Lỗi khi lấy số lượng role:", error);

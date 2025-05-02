@@ -454,9 +454,15 @@ def get_or_create_qr_code():
         date=selected_date, class_session_id=class_section_id).first()
 
     if existing_session:
+        if not existing_session.qr_code_start or not existing_session.qr_code_end:
+            existing_session.qr_code_start = f"start:{class_section_id}:{selected_date}"
+            existing_session.qr_code_end = f"end:{class_section_id}:{selected_date}"
+            db.session.commit() 
         return jsonify({
-            "qr_code_start": existing_session.qr_code_start,
-            "qr_code_end": existing_session.qr_code_end
+            "data": {
+                "qr_code_start": existing_session.qr_code_start,
+                "qr_code_end": existing_session.qr_code_end
+            }
         }), 200
     else:
         qr_code_start = f"start:{class_section_id}:{selected_date}"
@@ -472,8 +478,10 @@ def get_or_create_qr_code():
         db.session.commit()
 
         return jsonify({
-            "qr_code_start": qr_code_start,
-            "qr_code_end": qr_code_end
+            "data": {
+                "qr_code_start": qr_code_start,
+                "qr_code_end": qr_code_end
+            }
         }), 201
     
 @teacher_bp.route('/enrollment/<int:class_section_id>/add', methods=['POST'])

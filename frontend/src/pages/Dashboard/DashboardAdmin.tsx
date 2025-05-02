@@ -2,6 +2,8 @@ import { Datepicker } from "flowbite-react";
 import { useEffect, useState } from "react";
 import authAPI from "../../api/authAPI";
 import Human from "../../assets/Human.png";
+import axios from "axios";
+import axiosClient from "../../api/axiosClient";
 
 const DashboardAdmin = () => {
   const [roleCounts, setRoleCounts] = useState<{
@@ -13,7 +15,6 @@ const DashboardAdmin = () => {
   useEffect(() => {
     async function getRoleData() {
       const data = await authAPI.fetchRoleCounts();
-      console.log(data);
       if (data) setRoleCounts(data);
     }
     getRoleData();

@@ -9,8 +9,8 @@ db_name = os.environ['DB_NAME']
 
 class Config:
     """Local MySQL connection string here"""
-    # SQLALCHEMY_DATABASE_URI = "mysql://{db_user}:{db_password}@localhost:3306/{db_name}".format(
-    # db_user=db_user, db_password=db_password, db_name=db_name)
+    SQLALCHEMY_DATABASE_URI = "mysql://{db_user}:{db_password}@localhost:3306/{db_name}".format(
+    db_user=db_user, db_password=db_password, db_name=db_name)
 
     """phpMyAdmin connection string here"""
     # SQLALCHEMY_DATABASE_URI = "mysql+pymysql://{db_user}@localhost:3306/{db_name}".format(

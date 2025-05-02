@@ -180,7 +180,7 @@ def mark_present_by_qr():
 
     student_id = int(g.user_id)
 
-    print("test",g.user_id)
+    print("test: ",g.user_id)
 
     attendance = Attendance.query.filter_by(
         attendance_session_id=attendance_session.id,
@@ -191,11 +191,11 @@ def mark_present_by_qr():
         return jsonify({"error": "Student not enrolled in this session"}), 404
 
     if attendance.status == "present":
-        return jsonify({"message": "Already marked as present"}), 200
+        return jsonify({"data":{"message": "Already marked as present"}}), 200
 
     attendance.status = "present"
-    attendance.checked_at = datetime.utcnow()
+    attendance.checked_at = datetime.now()
 
     db.session.commit()
 
-    return jsonify({"message": "Marked as present"}), 200
+    return jsonify({"data": {"message": "Marked as present"}}), 200
