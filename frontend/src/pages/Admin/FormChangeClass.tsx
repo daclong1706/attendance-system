@@ -5,16 +5,20 @@ import LoadingModal from "../../components/modal/LoadingModal";
 import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
 import { Button, FloatingLabel, Select, Datepicker } from "flowbite-react";
 import { fetchAllSubjects } from "../../store/slices/subjectReducer";
-import { createClass, fetchAllClasses } from "../../store/slices/classReducer";
+import { updateClass, fetchAllClasses } from "../../store/slices/classReducer";
+import { Class_session } from "../../types/classType";
+import axiosClient from "../../api/axiosClient";
 
-interface CreateClassFormProps {
+interface FormChangeClassProps {
   isOpen: boolean;
+  classID: number;
   onClose: () => void;
 }
 
-const CreateClassForm: React.FC<CreateClassFormProps> = ({
+const FormChangeClass: React.FC<FormChangeClassProps> = ({
   isOpen,
   onClose,
+  classID,
 }) => {
   const today = new Date();
   const threeMonthsLater = new Date();
@@ -27,67 +31,91 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
   const { loading } = useAppSelector((state) => state.user);
   const { users } = useAppSelector((state) => state.user);
   const { subjects } = useAppSelector((state) => state.subject);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [classData, setClassData] = useState({
-    subject_id: 0,
-    teacher_id: 0,
-    room: "",
-    day_of_week: 0,
-    start_time: "",
-    end_time: "",
-    start_date: "",
-    end_date: "",
-    semester: "",
-    year: 2025,
-  });
-  const [startDate, setStartDate] = useState(null as Date | null);
-  const [endDate, setEndDate] = useState(null as Date | null);
+  const [updatedData, setUpdatedData] = useState<Partial<Class_session>>({});
+  const iy = async (id: number) => {
+    try {
+      const response = await axiosClient.get<Class_session[]>(
+        "/class/infoClassID",
+        {
+          params: { id },
+        },
+      );
+
+      const classData = response.data[0];
+
+      if (classData) {
+        console.log(classData);
+        setUpdatedData({ ...classData });
+      } else {
+        showErrorMessage("Không tìm thấy dữ liệu");
+      }
+    } catch {
+      showErrorMessage("Sai");
+    }
+  };
+
+  useEffect(() => {
+    iy(classID);
+    setIsLoading(false);
+  }, [classID]);
   useEffect(() => {
     dispatch(fetchAllSubjects());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(fetchAllTeacher());
   }, [dispatch]);
-  // console.log(loading);
+
+  const [startDate, setStartDate] = useState<Date>(() => {
+    const date = updatedData.start_date
+      ? new Date(updatedData.start_date)
+      : new Date();
+    return isNaN(date.getTime()) ? new Date() : date;
+  });
+  const [endDate, setEndDate] = useState<Date>(() => {
+    const date = updatedData.end_date
+      ? new Date(updatedData.end_date)
+      : new Date();
+    return isNaN(date.getTime()) ? new Date() : date;
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startDate) setStartDate(today);
-    if (!endDate) setEndDate(threeMonthsLater);
-    const newClassData = {
-      ...classData,
+    if (Object.keys(updatedData).length === 0) {
+      showErrorMessage("Vui lòng nhập thông tin cần cập nhật!");
+      return;
+    }
+    setUpdatedData({
+      ...updatedData,
       start_date: startDate?.toISOString().split("T")[0],
       end_date: endDate?.toISOString().split("T")[0],
-    };
-
-    console.log(newClassData);
+    });
     try {
-      await dispatch(createClass(newClassData)).unwrap();
+      await dispatch(updateClass({ classId: classID, updatedData })).unwrap();
       dispatch(fetchAllClasses());
       showSuccessMessage("Tạo lớp học thành công");
       onClose();
     } catch {
       showErrorMessage("Lỗi khi tạo lớp học!");
+      setIsLoading(true);
     }
     onClose();
   };
 
   if (!isOpen) return false;
-
   return (
     <div
       className={`fixed inset-0 flex items-center justify-center bg-black/50`}
     >
       <div className="-mt-50 w-1/2 rounded-lg bg-white p-6 py-12 shadow-lg">
-        <h2 className="mb-4 text-xl font-bold">Tạo lớp học</h2>
+        <h2 className="mb-4 text-xl font-bold">Chỉnh sửa thông tin lớp học</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <FloatingLabel
             variant="outlined"
             label="Phòng"
             type="text"
+            value={updatedData.room}
             onChange={(e) =>
-              setClassData({ ...classData, room: e.target.value })
+              setUpdatedData({ ...updatedData, room: e.target.value })
             }
             required
           />
@@ -95,10 +123,10 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
             <Select
               id="subject_iD"
               required
-              value={classData.subject_id || ""}
+              value={updatedData.subject_id}
               onChange={(e) =>
-                setClassData({
-                  ...classData,
+                setUpdatedData({
+                  ...updatedData,
                   subject_id: Number(e.target.value),
                 })
               }
@@ -116,10 +144,10 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
             <Select
               id="teacher_iD"
               required
-              value={classData.teacher_id || ""}
+              value={updatedData.teacher_id}
               onChange={(e) =>
-                setClassData({
-                  ...classData,
+                setUpdatedData({
+                  ...updatedData,
                   teacher_id: Number(e.target.value),
                 })
               }
@@ -140,10 +168,10 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
               className="col-span-4"
               id="dayOfWeek"
               required
-              value={classData.day_of_week}
+              value={updatedData.day_of_week}
               onChange={(e) =>
-                setClassData({
-                  ...classData,
+                setUpdatedData({
+                  ...updatedData,
                   day_of_week: Number(e.target.value),
                 })
               }
@@ -167,7 +195,9 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
               maxDate={threeMonthsLater}
               value={startDate}
               required
-              onChange={(date: Date | null) => setStartDate(date)}
+              onChange={(date: Date | null) => {
+                if (date) setStartDate(date);
+              }}
             />
             <div className="flex items-center justify-center">-</div>
             <Datepicker
@@ -177,23 +207,21 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
               maxDate={sixMonthsLater}
               value={endDate}
               required
-              onChange={(date: Date | null) => setEndDate(date)}
+              onChange={(date: Date | null) => {
+                if (date) setEndDate(date);
+              }}
             />
           </div>
 
           <Select
             id="timeSlot"
             required
-            value={
-              classData?.start_time && classData?.end_time
-                ? `${classData.start_time}-${classData.end_time}`
-                : ""
-            }
+            value={`${updatedData.start_time}-${updatedData.end_time}`}
             onChange={(e) => {
               const [start, end] = e.target.value.split("-");
               if (start && end) {
-                setClassData({
-                  ...classData,
+                setUpdatedData({
+                  ...updatedData,
                   start_time: start,
                   end_time: end,
                 });
@@ -218,18 +246,21 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
               type="number"
               min={today.getFullYear()}
               max={today.getFullYear() + 1}
-              value={classData.year ? classData.year : today.getFullYear()}
+              value={updatedData.year ? updatedData.year : today.getFullYear()}
               onChange={(e) =>
-                setClassData({ ...classData, year: e.target.valueAsNumber })
+                setUpdatedData({
+                  ...updatedData,
+                  year: e.target.valueAsNumber,
+                })
               }
               required
             />
             <Select
               id="semester"
               required
-              value={classData.semester ? classData.semester : ""}
+              value={updatedData.semester}
               onChange={(e) =>
-                setClassData({ ...classData, semester: e.target.value })
+                setUpdatedData({ ...updatedData, semester: e.target.value })
               }
             >
               <option value="" disabled>
@@ -245,14 +276,15 @@ const CreateClassForm: React.FC<CreateClassFormProps> = ({
               Hủy
             </Button>
             <Button type="submit" color="green">
-              Tạo lớp học
+              Thay đổi thông tin lớp học
             </Button>
           </div>
         </form>
       </div>
       <LoadingModal isOpen={loading} />
+      <LoadingModal isOpen={isLoading} />
     </div>
   );
 };
 
-export default CreateClassForm;
+export default FormChangeClass;

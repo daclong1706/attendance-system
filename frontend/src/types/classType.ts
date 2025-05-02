@@ -23,3 +23,17 @@ export interface ClassDetail {
   end_date: string;
   students: Student[];
 }
+
+export interface Class_session {
+  id: number;
+  subject_id: number;
+  teacher_id: number;
+  room: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  start_date: string;
+  end_date: string;
+  semester: string;
+  year: number;
+}

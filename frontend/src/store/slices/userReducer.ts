@@ -37,6 +37,17 @@ export const fetchUserById = createAsyncThunk(
     }
   },
 );
+export const fetchAllTeacher = createAsyncThunk<User[], void>(
+  "user/fetchAllTeacher",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userAPI.getAllTeacher();
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
 
 export const createUser = createAsyncThunk<User, Partial<User>>(
   "user/createUser",
@@ -120,6 +131,22 @@ const userSlice = createSlice({
         state.loading = false;
         state.error =
           (action.payload as string) || "Không thể tìm thấy người dùng!";
+      })
+      .addCase(fetchAllTeacher.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchAllTeacher.fulfilled,
+        (state, action: PayloadAction<User[]>) => {
+          state.loading = false;
+          state.users = action.payload;
+        },
+      )
+      .addCase(fetchAllTeacher.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Không thể tìm thời khóa biểu";
       })
       .addCase(createUser.pending, (state) => {
         state.loading = true;
