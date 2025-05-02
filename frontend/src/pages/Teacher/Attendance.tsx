@@ -76,12 +76,18 @@ const AttendanceTeacher = () => {
         }),
       );
     }
-  }, [selectedClass, selectedDate, dispatch]);
 
-  const openQRModal = () => setIsQRModalOpen(true);
-  const closeQRModal = () => setIsQRModalOpen(false);
-  const openFaceModal = () => setIsFaceModalOpen(true);
-  const closeFaceModal = () => setIsFaceModalOpen(false);
+    if (!isQRModalOpen && selectedClass) {
+      console.log(isQRModalOpen);
+      dispatch(
+        fetchAttendanceByClass({
+          class_section_id: selectedClass?.id,
+          selected_date: selectedDate,
+          day_of_week: new Date(selectedDate).getDay(),
+        }),
+      );
+    }
+  }, [selectedClass, selectedDate, dispatch, isQRModalOpen]);
 
   const handleExportData = () => {
     const worksheet = XLSX.utils.json_to_sheet(users);
@@ -150,6 +156,14 @@ const AttendanceTeacher = () => {
         user.id === id ? { ...user, attendance_status: newStatus } : user,
       ),
     );
+  };
+
+  const handleOpenQR = () => {
+    if (selectedClass && selectedDate) {
+      setIsQRModalOpen(true);
+    } else {
+      showErrorMessage("Không thể mở mã QR");
+    }
   };
 
   const handleSaveAttendance = () => {
@@ -229,11 +243,11 @@ const AttendanceTeacher = () => {
 
         {/* Khu vực nút Face & QR Code (luôn nằm trên) */}
         <div className="flex w-full justify-center gap-2 md:w-auto md:justify-end">
-          <Button onClick={openFaceModal}>
+          <Button onClick={() => setIsFaceModalOpen(true)}>
             <TbFaceId className="mr-2 h-5 w-5" />
             Face
           </Button>
-          <Button onClick={openQRModal}>
+          <Button onClick={handleOpenQR}>
             <MdQrCode2 className="mr-2 h-5 w-5" />
             QR Code
           </Button>
@@ -322,8 +336,16 @@ const AttendanceTeacher = () => {
           Điểm danh tất cả
         </Button>
       </div>
-      {isQRModalOpen && <QRAttendance onClose={closeQRModal} />}
-      {isFaceModalOpen && <FaceAttendance onClose={closeFaceModal} />}
+      {isQRModalOpen && (
+        <QRAttendance
+          onClose={() => setIsQRModalOpen(false)}
+          classSectionId={selectedClass?.id || 0}
+          selectedDate={selectedDate}
+        />
+      )}
+      {isFaceModalOpen && (
+        <FaceAttendance onClose={() => setIsFaceModalOpen(false)} />
+      )}
       <LoadingModal isOpen={loading} />
     </section>
   );
