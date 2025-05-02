@@ -73,7 +73,7 @@ class ClassAPI {
   }
   async updateClass(
     classID: number,
-    updatedData: Partial<Class_session>,
+    updatedData: Class_session,
   ): Promise<Class_session> {
     try {
       const response = await axiosClient.put<Class_session>(

@@ -32,8 +32,10 @@ const FormChangeClass: React.FC<FormChangeClassProps> = ({
   const { users } = useAppSelector((state) => state.user);
   const { subjects } = useAppSelector((state) => state.subject);
   const [isLoading, setIsLoading] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  // const [classData, setClassData] = useState<Class_session>();
 
-  const [updatedData, setUpdatedData] = useState<Partial<Class_session>>({});
+  const [updatedData, setUpdatedData] = useState<Class_session>();
   const iy = async (id: number) => {
     try {
       const response = await axiosClient.get<Class_session[]>(
@@ -43,65 +45,73 @@ const FormChangeClass: React.FC<FormChangeClassProps> = ({
         },
       );
 
-      const classData = response.data[0];
-
-      if (classData) {
-        console.log(classData);
-        setUpdatedData({ ...classData });
-      } else {
-        showErrorMessage("Không tìm thấy dữ liệu");
-      }
+      setUpdatedData(response.data[0]);
     } catch {
       showErrorMessage("Sai");
     }
   };
-
   useEffect(() => {
     iy(classID);
     setIsLoading(false);
   }, [classID]);
   useEffect(() => {
+    if (updatedData && Object.keys(updatedData).length > 0) {
+      console.log("updatedData đã cập nhật:", updatedData);
+      if (isComplete) {
+        try {
+          if (updatedData)
+            dispatch(updateClass({ classId: classID, updatedData })).unwrap();
+          dispatch(fetchAllClasses());
+          showSuccessMessage("Tạo lớp học thành công");
+          onClose();
+        } catch {
+          showErrorMessage("Lỗi khi chỉnh sửa lớp học!");
+          setIsLoading(true);
+        }
+        setIsComplete(false);
+        onClose();
+      }
+    }
+  }, [updatedData]);
+  useEffect(() => {
     dispatch(fetchAllSubjects());
     dispatch(fetchAllTeacher());
   }, [dispatch]);
+  const handleDate = (dateString: string) => {
+    // Phân tích chuỗi gốc thành đối tượng Date
+    const dateObject = new Date(dateString);
 
-  const [startDate, setStartDate] = useState<Date>(() => {
-    const date = updatedData.start_date
-      ? new Date(updatedData.start_date)
-      : new Date();
-    return isNaN(date.getTime()) ? new Date() : date;
-  });
-  const [endDate, setEndDate] = useState<Date>(() => {
-    const date = updatedData.end_date
-      ? new Date(updatedData.end_date)
-      : new Date();
-    return isNaN(date.getTime()) ? new Date() : date;
-  });
+    // Lấy các thành phần Năm, Tháng, Ngày
+    const year = dateObject.getFullYear();
+    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // getMonth() trả về 0-11
+    const day = dateObject.getDate().toString().padStart(2, "0");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    // Ghép lại thành chuỗi 'YYYY-MM-DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (Object.keys(updatedData).length === 0) {
+    if (updatedData && Object.keys(updatedData).length === 0) {
       showErrorMessage("Vui lòng nhập thông tin cần cập nhật!");
       return;
     }
-    setUpdatedData({
-      ...updatedData,
-      start_date: startDate?.toISOString().split("T")[0],
-      end_date: endDate?.toISOString().split("T")[0],
-    });
-    try {
-      await dispatch(updateClass({ classId: classID, updatedData })).unwrap();
-      dispatch(fetchAllClasses());
-      showSuccessMessage("Tạo lớp học thành công");
-      onClose();
-    } catch {
-      showErrorMessage("Lỗi khi tạo lớp học!");
-      setIsLoading(true);
+    if (updatedData) {
+      setUpdatedData({
+        ...updatedData,
+        start_time: updatedData.start_time.substring(0, 5),
+        end_time: updatedData.end_time.substring(0, 5),
+        start_date: handleDate(updatedData.start_date),
+        end_date: handleDate(updatedData.end_date),
+      });
     }
-    onClose();
+    setIsComplete(true);
+    console.log("Data cuối: ", updatedData);
   };
 
   if (!isOpen) return false;
+  if (!updatedData) return <LoadingModal isOpen={true} />;
   return (
     <div
       className={`fixed inset-0 flex items-center justify-center bg-black/50`}
@@ -123,7 +133,7 @@ const FormChangeClass: React.FC<FormChangeClassProps> = ({
             <Select
               id="subject_iD"
               required
-              value={updatedData.subject_id}
+              value={updatedData.subject_id ?? ""}
               onChange={(e) =>
                 setUpdatedData({
                   ...updatedData,
@@ -144,7 +154,7 @@ const FormChangeClass: React.FC<FormChangeClassProps> = ({
             <Select
               id="teacher_iD"
               required
-              value={updatedData.teacher_id}
+              value={updatedData.teacher_id ?? ""}
               onChange={(e) =>
                 setUpdatedData({
                   ...updatedData,
@@ -193,10 +203,14 @@ const FormChangeClass: React.FC<FormChangeClassProps> = ({
               title="Ngày bắt đầu"
               minDate={today}
               maxDate={threeMonthsLater}
-              value={startDate}
+              value={new Date(updatedData.start_date)}
               required
               onChange={(date: Date | null) => {
-                if (date) setStartDate(date);
+                if (date)
+                  setUpdatedData({
+                    ...updatedData,
+                    start_date: date?.toISOString().split("T")[0],
+                  });
               }}
             />
             <div className="flex items-center justify-center">-</div>
@@ -205,10 +219,14 @@ const FormChangeClass: React.FC<FormChangeClassProps> = ({
               title="Ngày kết thúc"
               minDate={threeMonthsLater}
               maxDate={sixMonthsLater}
-              value={endDate}
+              value={new Date(updatedData.end_date)}
               required
               onChange={(date: Date | null) => {
-                if (date) setEndDate(date);
+                if (date)
+                  setUpdatedData({
+                    ...updatedData,
+                    end_date: date?.toISOString().split("T")[0],
+                  });
               }}
             />
           </div>

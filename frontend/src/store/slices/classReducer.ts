@@ -68,7 +68,6 @@ export const deleteClass = createAsyncThunk<{ message: string }, number>(
   async (classId, { rejectWithValue }) => {
     try {
       const response = await classAPI.deleteClass(classId);
-      console.log(response);
       return response;
     } catch (error) {
       return rejectWithValue(error);
@@ -78,7 +77,7 @@ export const deleteClass = createAsyncThunk<{ message: string }, number>(
 
 export const updateClass = createAsyncThunk<
   Class_session,
-  { classId: number; updatedData: Partial<Class_session> }
+  { classId: number; updatedData: Class_session }
 >(
   "class/updateClass",
   async ({ classId, updatedData }, { rejectWithValue }) => {
