@@ -10,7 +10,7 @@ from app.models.enrollment import Enrollment
 from app.models.attendance import Attendance, AttendanceLog, AttendanceSession
 from app.middlewares.auth_middleware import jwt_required_middleware
 from app.extensions import db, bcrypt
-from app.utils import generate_random_code
+from app.utils import generate_random_code, generate_qr_code_base64
 
 teacher_bp = Blueprint("teacher_bp", __name__)
 
@@ -222,8 +222,8 @@ def create_attendance_session():
     attendance_session = AttendanceSession(
         class_session_id=class_section_id,
         date=date,
-        qr_code_start=generate_random_code(),
-        qr_code_end=generate_random_code()
+        qr_code_start=f"start:{class_section_id}:{date_str}",
+        qr_code_end=f"start:{class_section_id}:{date_str}"
     )
 
     db.session.add(attendance_session)
@@ -321,8 +321,8 @@ def get_class_attendance():
         attendance_session = AttendanceSession(
             class_session_id=class_section_id,
             date=selected_date_obj,
-            qr_code_start="GeneratedStartQR",
-            qr_code_end="GeneratedEndQR"
+            qr_code_start = f"start:{class_section_id}:{selected_date}",
+            qr_code_end = f"end:{class_section_id}:{selected_date}"
         )
         db.session.add(attendance_session)
         db.session.commit()
@@ -454,13 +454,19 @@ def get_or_create_qr_code():
         date=selected_date, class_session_id=class_section_id).first()
 
     if existing_session:
+        if not existing_session.qr_code_start or not existing_session.qr_code_end:
+            existing_session.qr_code_start = f"start:{class_section_id}:{selected_date}"
+            existing_session.qr_code_end = f"end:{class_section_id}:{selected_date}"
+            db.session.commit() 
         return jsonify({
-            "qr_code_start": existing_session.qr_code_start,
-            "qr_code_end": existing_session.qr_code_end
+            "data": {
+                "qr_code_start": existing_session.qr_code_start,
+                "qr_code_end": existing_session.qr_code_end
+            }
         }), 200
     else:
-        qr_code_start = "QrCodeStart"
-        qr_code_end = "QrCodeEnd"
+        qr_code_start = f"start:{class_section_id}:{selected_date}"
+        qr_code_end = f"end:{class_section_id}:{selected_date}"
 
         attendance_session = AttendanceSession(
             class_session_id=class_section_id,
@@ -472,8 +478,10 @@ def get_or_create_qr_code():
         db.session.commit()
 
         return jsonify({
-            "qr_code_start": qr_code_start,
-            "qr_code_end": qr_code_end
+            "data": {
+                "qr_code_start": qr_code_start,
+                "qr_code_end": qr_code_end
+            }
         }), 201
     
 @teacher_bp.route('/enrollment/<int:class_section_id>/add', methods=['POST'])

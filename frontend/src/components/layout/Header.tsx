@@ -12,6 +12,7 @@ import {
 import { useAppSelector } from "../../store/hook";
 import { useLocation, useNavigate } from "react-router-dom";
 import { HiArrowLeft } from "react-icons/hi";
+import { MdQrCode2 } from "react-icons/md";
 
 interface Props {
   toggleSidebar: () => void;
@@ -25,6 +26,7 @@ const Header = ({ toggleSidebar }: Props) => {
   // Kiểm tra nếu đường dẫn chứa "admin/class-management/:id" hoặc "teacher/class/:id"
   const showBackButton =
     /^\/(admin\/class-management|teacher\/class)\/\d+$/.test(location.pathname);
+  const showQRButton = /^\/student\/.*/.test(location.pathname);
 
   return (
     <>
@@ -38,6 +40,11 @@ const Header = ({ toggleSidebar }: Props) => {
           )}
         </NavbarBrand>
         <div className="flex gap-2 md:order-2">
+          {showQRButton && (
+            <button onClick={() => navigate("attendance")}>
+              <MdQrCode2 />
+            </button>
+          )}
           <DarkThemeToggle />
           <div className="my-1 mr-2 border border-gray-400"></div>
           <Dropdown

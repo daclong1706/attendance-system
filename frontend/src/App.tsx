@@ -43,7 +43,7 @@ export default function App() {
               <Route index element={<Navigate to="/student/dashboard" />} />
               <Route path="dashboard" element={<DashboardStudent />} />
               <Route path="schedule" element={<ScheduleStudent />} />
-              <Route path="attendance-status" element={<AttendanceStudent />} />
+              <Route path="attendance" element={<AttendanceStudent />} />
               {/* <Route path="/schedule" element={<SchedulePage />} /> */}
             </Route>
             <Route

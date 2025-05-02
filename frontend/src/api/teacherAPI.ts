@@ -3,6 +3,7 @@ import {
   AttendanceResponse,
 } from "../types/attendanceTypes";
 import { Class, ClassDetail } from "../types/classType";
+import { QRCodeResponse } from "../types/responseTypes";
 import { Schedule } from "../types/scheduleTypes";
 import axiosClient from "./axiosClient";
 
@@ -75,6 +76,39 @@ class TeacherAPI {
       });
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+
+  async getOrCreateQRCode(
+    classSectionId: number,
+    selectedDate: string,
+  ): Promise<QRCodeResponse> {
+    try {
+      const response = await axiosClient.post<QRCodeResponse>(
+        "/teacher/attendance/qr-code",
+        {
+          class_section_id: classSectionId,
+          date: selectedDate,
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching or creating QR code:", error);
+      throw error;
+    }
+  }
+
+  async generateQRCode(data: string): Promise<string> {
+    try {
+      const response = await axiosClient.get(
+        `/qr/generate_qr/${encodeURIComponent(data)}`,
+        { responseType: "blob" },
+      );
+
+      return URL.createObjectURL(response as unknown as Blob);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
       throw error;
     }
   }

@@ -73,11 +73,11 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
       label: "Lịch học",
       icon: icons.scheduleManagement,
     },
-    {
-      path: "/student/attendance-status",
-      label: "Tình trạng điểm danh",
-      icon: icons.attendance,
-    },
+    // {
+    //   path: "/student/attendance-status",
+    //   label: "Tình trạng điểm danh",
+    //   icon: icons.attendance,
+    // },
     // {
     //   path: "/student/notifications",
     //   label: "Thông báo",
@@ -133,6 +133,14 @@ const Sidebar = ({ isOpenSidebar, toggleSidebar }: Props) => {
                     {isOpenSidebar && <span>{item.label}</span>}
                   </NavLink>
                 ))}
+                <div className="my-2">
+                  <Button onClick={handleLogout} color="red" className="w-full">
+                    <FaSignOutAlt
+                      className={`${!isSidebarCollapsed ? "mr-2" : ""} h-5 w-5 rotate-180`}
+                    />
+                    {!isSidebarCollapsed && <span>Đăng xuất</span>}
+                  </Button>
+                </div>
               </nav>
             </div>
           </div>
