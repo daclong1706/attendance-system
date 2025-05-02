@@ -11,7 +11,16 @@ class UserAPI {
       throw error;
     }
   }
-
+  // Teacher với Student kiểu giống nhau
+  async getAllTeacher(): Promise<User[]> {
+    try {
+      const response = await axiosClient.get<User[]>("/user/getAllTeacher");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
   async getUserById(id: number): Promise<User> {
     try {
       const response = await axiosClient.get<User>("/user/getUserInformation", {

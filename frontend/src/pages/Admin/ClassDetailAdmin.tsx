@@ -34,7 +34,6 @@ const ClassDetailAdmin = () => {
       dispatch(fetchClassById(Number(id)));
     }
   }, [dispatch, id]);
-
   const addStudentsToClass = async (students: number[]) => {
     setIsLoading(true);
     try {

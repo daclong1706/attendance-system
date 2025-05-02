@@ -9,6 +9,7 @@ class AuthAPI {
         password,
       });
       localStorage.setItem("auth", JSON.stringify(response.data));
+      console.log("Login successful:", response.data);
       return response.data;
     } catch (error) {
       console.log(error);

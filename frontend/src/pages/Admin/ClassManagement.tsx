@@ -1,6 +1,6 @@
-import { AiOutlineSearch } from "react-icons/ai";
 import { FaPlusSquare } from "react-icons/fa";
 import { useTable } from "../../components/hook/useTable";
+import DeleteModal from "../../components/modal/DeleteModal";
 import PaginationComponent from "../../components/ui/PanigationComponent";
 import TableBodyComponent from "../../components/ui/table/TableBodyComponent";
 import TableCellComponent from "../../components/ui/table/TableCellComponent";
@@ -10,14 +10,19 @@ import TableHeadComponent from "../../components/ui/table/TableHeadComponent";
 import TableRowComponent from "../../components/ui/table/TableRowComponent";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { useEffect, useState } from "react";
-import { Class } from "../../types/classType";
-import { fetchAllClasses } from "../../store/slices/classReducer";
+import { Class, Class_session } from "../../types/classType";
+import {
+  fetchAllClasses,
+  fetchClassById,
+} from "../../store/slices/classReducer";
 import LoadingModal from "../../components/modal/LoadingModal";
 import ActionComponent from "../../components/ui/ActionComponent";
 import { Button } from "flowbite-react";
 import SearchComponent from "../../components/ui/SearchComponent";
 import { useNavigate } from "react-router-dom";
 import CreateClassForm from "./CreateClassForm";
+import FormChangeClass from "./FormChangeClass";
+import axiosClient from "../../api/axiosClient";
 
 const ClassManagement = () => {
   const itemsPerPage = 10;
@@ -27,6 +32,7 @@ const ClassManagement = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,13 +40,10 @@ const ClassManagement = () => {
       navigate(`${selectedClass.id}`);
     }
   }, [isViewOpen, selectedClass, navigate]);
-
   const { classes, loading } = useAppSelector((state) => state.class);
-
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
-
   const {
     paginatedData: data,
     totalItems,
@@ -129,6 +132,7 @@ const ClassManagement = () => {
                       data={d}
                       setSelectedData={setSelectedClass}
                       setIsViewOpen={setIsViewOpen}
+                      setIsEditOpen={setIsEditOpen}
                       setIsDeleteOpen={setIsDeleteOpen}
                     />
                   </TableCellComponent>
@@ -160,6 +164,27 @@ const ClassManagement = () => {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
       />
+      {selectedClass && (
+        <DeleteModal
+          dataType="Class"
+          dataName={
+            " môn " +
+            selectedClass.subject_name +
+            " của giáo viên " +
+            selectedClass.teacher_name
+          }
+          dataID={selectedClass.id}
+          openModal={isDeleteOpen}
+          setOpenModal={setIsDeleteOpen}
+        />
+      )}
+      {selectedClass && (
+        <FormChangeClass
+          isOpen={isEditOpen}
+          classID={selectedClass.id}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 };

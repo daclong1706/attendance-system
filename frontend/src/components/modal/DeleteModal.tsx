@@ -5,7 +5,7 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useAppDispatch } from "../../store/hook";
 import { deleteUser } from "../../store/slices/userReducer";
 import { deleteSubject } from "../../store/slices/subjectReducer";
-// import { deleteClass } from "../../store/slices/classReducer";
+import { deleteClass } from "../../store/slices/classReducer";
 
 interface DeleteModalProps {
   dataType: "User" | "Subject" | "Class"; // Loại dữ liệu cần xóa
@@ -38,7 +38,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         dispatch(deleteSubject(dataID));
         break;
       case "Class":
-        // dispatch(deleteClass(dataID));
+        dispatch(deleteClass(dataID));
         break;
       default:
         alert("Loại dữ liệu không hợp lệ!");
