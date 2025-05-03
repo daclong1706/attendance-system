@@ -8,6 +8,10 @@ from tqdm import tqdm
 from app.Model.scripts.capture_camera import capture_face
 import cv2
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+USERS_DIR = os.path.join(BASE_DIR, "data", "users")
+ATTENDANCE_FILE = os.path.join(BASE_DIR, "attendance_records", "attendance.csv")
+
 
 def load_optimal_threshold(threshold_path='data/embeddings/optimal_threshold.npy'):
     """
@@ -50,7 +54,7 @@ def convert_npy_to_image(npy_path):
     return img
 
 
-def mark_attendance(image_path, users_dir='D:\\Project\\attendance-system\\backend\\app\\Model\\scripts\\data\\users', threshold=0.5, attendance_file='D:\\Project\\attendance-system\\backend\\app\\Model\\scripts\\attendance_records\\attendance.csv'):
+def mark_attendance(image_path, users_dir=USERS_DIR, threshold=0.5, attendance_file=ATTENDANCE_FILE):
     """
     Đánh dấu điểm danh dựa trên ảnh đầu vào.
 

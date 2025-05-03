@@ -344,7 +344,11 @@ const AttendanceTeacher = () => {
         />
       )}
       {isFaceModalOpen && (
-        <FaceAttendance onClose={() => setIsFaceModalOpen(false)} />
+        <FaceAttendance
+          onClose={() => setIsFaceModalOpen(false)}
+          classSectionId={selectedClass?.id || 0}
+          selectedDate={selectedDate}
+        />
       )}
       <LoadingModal isOpen={loading} />
     </section>

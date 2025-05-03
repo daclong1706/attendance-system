@@ -27,7 +27,7 @@ def create_app(config_class=Config):
     app.register_blueprint(teacher_bp, url_prefix='/teacher')
     app.register_blueprint(student_bp, url_prefix='/student')
     app.register_blueprint(class_bp, url_prefix="/class")
-    # app.register_blueprint(recognition_bp, url_prefix="/recognition")
+    app.register_blueprint(recognition_bp, url_prefix="/recognition")
 
     app.register_blueprint(qr_bp, url_prefix='/qr')
     app.register_blueprint(debug_bp, url_prefix='/debug')
