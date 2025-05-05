@@ -4,6 +4,7 @@ import { useState } from "react";
 import recognitionAPI from "../../api/recognitionAPI";
 import { FaceResponse } from "../../types/responseTypes";
 import { showErrorMessage, showSuccessMessage } from "../../helper/toastHelper";
+import LoadingModal from "../../components/modal/LoadingModal";
 
 interface Props {
   onClose: () => void;
@@ -15,6 +16,7 @@ const FaceAttendance = ({ onClose, classSectionId, selectedDate }: Props) => {
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [student, setStudent] = useState<FaceResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleCapture = (blob: Blob) => {
     setImageBlob(blob);
@@ -34,16 +36,23 @@ const FaceAttendance = ({ onClose, classSectionId, selectedDate }: Props) => {
       class_section_id: classSectionId,
       selected_date: selectedDate,
     };
-
+    setLoading(true);
     try {
       const response = await recognitionAPI.sendFaceRecognitionData(
         imageBlob,
         requestData,
       );
       setStudent(response);
-      showSuccessMessage(`Nhận diện thành công sinh viên ${response?.name}`);
+      console.log(response);
+      if (response == null) {
+        showErrorMessage("Nhận diện không thành công");
+      } else {
+        showSuccessMessage(`Nhận diện thành công sinh viên ${response?.name}`);
+      }
+      setLoading(false);
     } catch {
       showErrorMessage("Nhận diện không thành công");
+      setLoading(false);
     }
   };
 
@@ -84,6 +93,7 @@ const FaceAttendance = ({ onClose, classSectionId, selectedDate }: Props) => {
           </div>
         </div>
       </div>
+      <LoadingModal isOpen={loading} />
     </div>
   );
 };
