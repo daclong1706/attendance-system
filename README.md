@@ -2,7 +2,7 @@
 
 ## 🔍 Giới thiệu
 
-Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt** và/hoặc **mã QR** để xác minh danh tính sinh viên hoặc nhân viên. Dự án này được phát triển với mục tiêu giảm thiểu gian lận điểm danh, tiết kiệm thời gian và tăng tính chính xác.
+Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt** và/hoặc **mã QR** để xác minh danh tính sinh viên. Dự án này được phát triển với mục tiêu giảm thiểu gian lận điểm danh, tiết kiệm thời gian cho giáo viên và tăng tính chính xác.
 
 - Backend: Flask + Deep Learning (DeepFace, MTCNN, Retina Face, TensorFlow)
 - Frontend: Vue.js
@@ -49,7 +49,7 @@ source venv/bin/activate  # hoặc .\venv\Scripts\activate trên Windows
 pip install -r requirements.txt
 ```
 
-### Cài các package và dependencies cả model nhận diện khuôn mặt
+### Cài các package và dependencies của model nhận diện khuôn mặt
 
 ```bash
 cd backend/app/Model
