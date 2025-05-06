@@ -5,7 +5,7 @@
 Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt** và/hoặc **mã QR** để xác minh danh tính sinh viên hoặc nhân viên. Dự án này được phát triển với mục tiêu giảm thiểu gian lận điểm danh, tiết kiệm thời gian và tăng tính chính xác.
 
 - Backend: Flask + Deep Learning (DeepFace, MTCNN, Retina Face, TensorFlow)
-- Frontend: Vue.js
+- Frontend: React.js
 - Database: MySQL
 
 ## 🎯 Tính năng chính
@@ -29,7 +29,7 @@ Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt**
 | QR Code          | qrcode, Pillow                                       |
 | Database         | MySQL                                                |
 | API Security     | JWT                                                  |
-| Frontend         | Vue.js, Axios                                        |
+| Frontend         | React, Axios, TypeScrip                              |
 
 ## 🛠️ Cài đặt dự án
 
@@ -49,12 +49,12 @@ source venv/bin/activate  # hoặc .\venv\Scripts\activate trên Windows
 pip install -r requirements.txt
 ```
 
-### Cài các package và dependencies cả model nhận diện khuôn mặt
+<!-- ### Cài các package và dependencies cả model nhận diện khuôn mặt
 
 ```bash
 cd backend/app/Model
 pip install -r requirements.txt
-```
+``` -->
 
 ### Tạo database attendance_system từ MYSQL
 
@@ -89,6 +89,15 @@ cd backend
 python seed_data.py
 ```
 
+### Đăng ký khuôn mặt nhận diện (nếu cần)
+
+- Chạy file register_user.py để đăng ký khuôn mặt
+
+```bash
+cd backend/app/Model/scripts
+python register_user.py
+```
+
 ### Chạy server backend
 
 ```bash
@@ -110,7 +119,7 @@ Dự án này được phát hành theo giấy phép [MIT](./LICENSE).
 
 ## 📬 Liên hệ
 
-**Người phát triển:** Nhóm 4 (Nguyễn Đắc Long, Nguyễn Quốc Hưng, Cao Vinh Quang, Nguyễn Bảo Huy, Nguyễn Quốc Huy)  
+**Người phát triển:** Nguyễn Đắc Long, Nguyễn Quốc Hưng, Cao Vinh Quang, Nguyễn Bảo Huy, Nguyễn Quốc Huy
 📧 **Email:**  
 🌐 **GitHub:** [https://github.com/daclong1706](https://github.com/daclong1706)
 
@@ -133,5 +142,3 @@ flask db upgrade
  pip install -r requirements.txt
 ### B2: Thực hiện chạy code file register_user.py để tạo ra học sinh mới. Với mội học sinh mới cần cung cấp 5 tấm hình. Các tấm hình này sẽ được chuyển sang file numpy và bị xóa đi.
 ### B3: Thực hiện chạy file mark_attendance.py để điểm danh. Người điểm danh sẽ chụp 1 tấm ảnh và code sẽ so sánh độ tương đồng với các embedding đang có trong database. Nếu điểm danh thành công thông tin của học sinh sẽ được lưu vào file attendance.csv	 -->
-
-
