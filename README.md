@@ -5,7 +5,7 @@
 Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt** và/hoặc **mã QR** để xác minh danh tính sinh viên. Dự án này được phát triển với mục tiêu giảm thiểu gian lận điểm danh, tiết kiệm thời gian cho giáo viên và tăng tính chính xác.
 
 - Backend: Flask + Deep Learning (DeepFace, MTCNN, Retina Face, TensorFlow)
-- Frontend: Vue.js
+- Frontend: React
 - Database: MySQL
 
 ## 🎯 Tính năng chính
@@ -29,7 +29,7 @@ Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt**
 | QR Code          | qrcode, Pillow                                       |
 | Database         | MySQL                                                |
 | API Security     | JWT                                                  |
-| Frontend         | Vue.js, Axios                                        |
+| Frontend         | React, Axios                                        |
 
 ## 🛠️ Cài đặt dự án
 
