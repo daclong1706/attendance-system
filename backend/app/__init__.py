@@ -12,8 +12,8 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     
-    # CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+    # CORS(app, resources={r"/*": {"origins": "*"}})
     # Initialize Flask extensions here  
     db.init_app(app)
     migrate.init_app(app, db)

@@ -30,7 +30,7 @@ const Header = ({ toggleSidebar }: Props) => {
 
   return (
     <>
-      <Navbar fluid rounded className="rounded-2xl shadow">
+      <Navbar fluid rounded className="rounded-md shadow">
         <NavbarBrand>
           <NavbarToggle onClick={toggleSidebar} />
           {showBackButton && (
@@ -67,9 +67,9 @@ const Header = ({ toggleSidebar }: Props) => {
             }
           >
             <DropdownHeader className="block md:hidden">
-              <span className="block text-sm">Bonnie Green</span>
+              <span className="block text-sm">{user?.name}</span>
               <span className="block truncate text-sm font-medium">
-                name@flowbite.com
+                {user?.email}
               </span>
             </DropdownHeader>
             <DropdownItem>Dashboard</DropdownItem>

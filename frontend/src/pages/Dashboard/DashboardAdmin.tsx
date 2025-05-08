@@ -24,7 +24,7 @@ const DashboardAdmin = () => {
     <div className="mx-auto mt-4 max-w-6xl p-4 md:block">
       <div className="overflow-x-auto">
         <div className="grid grid-flow-col grid-rows-3 gap-4">
-          <div className="col-span-2 row-span-1 mt-2 rounded-2xl bg-white shadow dark:bg-gray-700">
+          <div className="col-span-2 row-span-1 mt-2 rounded-2xl bg-white shadow dark:bg-gray-700 bg-green-700">
             <div className="block items-center justify-center md:flex">
               <div className="mx-12 my-6 text-left">
                 <h1 className="mb-4 bg-gradient-to-r from-indigo-500 to-pink-600 bg-clip-text text-2xl font-extrabold text-transparent uppercase">

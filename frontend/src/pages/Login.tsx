@@ -58,7 +58,7 @@ const Login = () => {
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="password1" className="dark:text-gray-900">
-                  Your password
+                  Mật khẩu
                 </Label>
               </div>
               <TextInput
