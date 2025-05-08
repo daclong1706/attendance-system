@@ -5,11 +5,7 @@
 Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt** và/hoặc **mã QR** để xác minh danh tính sinh viên. Dự án này được phát triển với mục tiêu giảm thiểu gian lận điểm danh, tiết kiệm thời gian cho giáo viên và tăng tính chính xác.
 
 - Backend: Flask + Deep Learning (DeepFace, MTCNN, Retina Face, TensorFlow)
-<<<<<<< HEAD
-- Frontend: React.js
-=======
 - Frontend: React
->>>>>>> de634c53efc187dbde4acbbd2c20003a32ef41bb
 - Database: MySQL
 
 ## 🎯 Tính năng chính
@@ -33,11 +29,7 @@ Hệ thống điểm danh thông minh sử dụng **nhận diện khuôn mặt**
 | QR Code          | qrcode, Pillow                                       |
 | Database         | MySQL                                                |
 | API Security     | JWT                                                  |
-<<<<<<< HEAD
 | Frontend         | React, Axios, TypeScrip                              |
-=======
-| Frontend         | React, Axios                                        |
->>>>>>> de634c53efc187dbde4acbbd2c20003a32ef41bb
 
 ## 🛠️ Cài đặt dự án
 
@@ -57,16 +49,10 @@ source venv/bin/activate  # hoặc .\venv\Scripts\activate trên Windows
 pip install -r requirements.txt
 ```
 
-<<<<<<< HEAD
-<!-- ### Cài các package và dependencies cả model nhận diện khuôn mặt
-=======
-### Cài các package và dependencies của model nhận diện khuôn mặt
->>>>>>> de634c53efc187dbde4acbbd2c20003a32ef41bb
-
-```bash
+<!-- ```bash
 cd backend/app/Model
 pip install -r requirements.txt
-``` -->
+``` --> -->
 
 ### Tạo database attendance_system từ MYSQL
 
